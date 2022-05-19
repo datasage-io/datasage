@@ -1,1 +1,3 @@
 package application
+
+func main() {}
