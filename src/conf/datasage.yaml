@@ -1,0 +1,22 @@
+application:
+  name: Datasage
+
+logging:
+  level: INFO
+
+server:
+  port: 1989
+
+adaptors:
+  name: mysql
+  version: 5.7
+  env: k8s
+  is_operator: yes
+  percona: yes
+
+integrations:
+  name: kafka
+  topic: datalog
+  broker: broker.kafka.com
+  port: 11211
+
