@@ -13,6 +13,9 @@ adaptors:
   env: k8s
   is_operator: yes
   percona: yes
+  host: 122.122.122.1
+  username: root
+  password: abcdef
 
 integrations:
   name: kafka
