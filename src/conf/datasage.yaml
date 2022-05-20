@@ -6,6 +6,15 @@ logging:
 
 server:
   port: 1989
+  database: sqlite
+
+database:
+  sqlite:
+    name: datasage
+    host: localhost
+    user: datasage
+    pass: datasage
+    port: 1234
 
 adaptors:
   name: mysql
