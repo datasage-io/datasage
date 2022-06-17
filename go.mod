@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	github.com/go-sql-driver/mysql v1.6.0
+	github.com/gocarina/gocsv v0.0.0-20220531201732-5f969b02b902
 	github.com/lib/pq v1.10.6
 	modernc.org/sqlite v1.17.3
 )

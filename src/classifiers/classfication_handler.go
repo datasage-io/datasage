@@ -8,7 +8,7 @@ import (
 )
 
 func Run() {
-
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	//Fetch MetaData
 	adpt, err := adaptors.New(adaptors.AdaptorConfig{
 		Type:     "mysql",
@@ -37,23 +37,31 @@ func Run() {
 		}
 	}
 
-	//Create new internal storage
-	st, err := storage.NewInternalStorage("datasage.db")
 	if err != nil {
 		log.Println(err.Error())
 	}
 
+	st, err := storage.New(storage.StorageConfig{Type: "internal", Path: "datasage.db"})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 	//get all classes
-	classes, err := st.GetAllClasses()
+	classes, err := st.GetClasses()
 	if err != nil {
 		log.Println(err.Error())
 	}
-	log.Println(len(classes))
+	log.Println("no of classes:= ", len(classes))
 
 	//get all tags
-	tags, err := st.GetAllTags()
+	tags, err := st.GetTags()
 	if err != nil {
 		log.Println(err.Error())
 	}
-	log.Println(len(tags))
+	log.Println("no of tags:= ", len(tags))
+
+	phonetag, err := st.GetAssociatedTags("Phone Number")
+	if err != nil {
+		log.Println(err.Error())
+	}
+	log.Println(phonetag)
 }
