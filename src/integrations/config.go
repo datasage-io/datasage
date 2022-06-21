@@ -8,7 +8,7 @@ import (
 )
 
 type Config struct {
-	Integrations Integrations
+	Integrations
 }
 
 type Integrations struct {
@@ -27,14 +27,16 @@ type KafkaLogConfig struct {
 	Port   string
 }
 
-func ReadLogConfig(path string) Config {
+func ReadLogConfig(path string) (Config, error) {
 	config := Config{}
 	data, err := os.ReadFile(path)
 	if err != nil {
 		log.Printf("err: %s", err)
+		return config, err
 	}
 	if yaml.Unmarshal(data, &config) != nil {
 		log.Printf("err: %s", err)
+		return config, err
 	}
-	return config
+	return config, nil
 }

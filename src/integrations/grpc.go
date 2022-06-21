@@ -13,14 +13,15 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func StreamLogToGRPC(Log string, grpcConfigs []GRPCLogConfig) {
+func StreamLogToGRPC(Log string, grpcConfigs []GRPCLogConfig) error {
 	for _, config := range grpcConfigs {
 		var conn *grpc.ClientConn
 		log.Printf("[GRPC] Dialing %s:%s \n", config.Host, config.Port)
-		conn, err := grpc.Dial(config.Host,
+		conn, err := grpc.Dial(config.Host+":"+config.Port,
 			grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
 			log.Fatalf("did not connect: %s", err)
+			return err
 		}
 		defer conn.Close()
 		c := grpc_config.NewDataSageServerClient(conn)
@@ -28,6 +29,9 @@ func StreamLogToGRPC(Log string, grpcConfigs []GRPCLogConfig) {
 		defer cancel()
 		if _, err = c.LogSend(ctx, &grpc_config.Log{Body: Log}); err != nil {
 			log.Printf("could not send the data: %v", err)
+			return err
 		}
+		log.Printf("[GRPC] Log send to %s:%s\n", config.Host, config.Port)
 	}
+	return nil
 }

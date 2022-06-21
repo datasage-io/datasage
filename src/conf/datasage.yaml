@@ -28,12 +28,12 @@ adaptors:
 
 integrations:
   kafka:
-    - topic: datalog
-      broker: broker.kafka.com
-      port: 11211
+    - topic: dblogs
+      broker: 127.0.0.1
+      port: 9092
   rpc:
-    - host: grpc.com
-      port: 1989
+    - host: 127.0.0.1
+      port: 2222
   http:
     - endpoint: https://accuknox.com/service/log
       method: post
