@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "github.com/datasage-io/datasage/proto/datasource";
+option go_package = ".;file";
 
 package datasource;
 
@@ -9,27 +9,27 @@ service Datasource {
 }
 
 message datasourceRequest {
-    string workspace_id  = 1
-    string sort          = 2
-    string filter        = 3
-    string page          = 4 
-    string limit         = 5
+    string workspace_id  = 1;
+    string sort          = 2;
+    string filter        = 3;
+    string page          = 4;
+    string limit         = 5;
 }
 
 message datasourceResponse {
-    repeated DatasourceResponse datasourceResponse = 1;
+    repeated ListAllDatasource datasourceResponse = 1;
 }
 
 message ListAllDatasource {
-    int          id              = 1          
-	string       user_id         = 2 
-	int          workspace_id    = 3  
-	string       data_domain     = 4   
-	string       name            = 5 
-	string       ds_description  = 6
-	string       ds_type         = 7
-	string       ds_version      = 8
-	string       ds_key          = 9        
-	time.Time    created_at      = 10
-	time.Time    deleted         = 11 
+    int64        id              = 1;          
+	string       user_id         = 2; 
+	int64        workspace_id    = 3;  
+	string       data_domain     = 4;   
+	string       name            = 5; 
+	string       ds_description  = 6;
+	string       ds_type         = 7;
+	string       ds_version      = 8;
+	string       ds_key          = 9;        
+	int64    	 created_at      = 10;
+	int64    	 deleted         = 11; 
 }
