@@ -1,0 +1,43 @@
+id,tag_name,rule,description
+1,PII,Phone Number,Personally Identifiable Information
+2,GDPR,Phone Number,General Data Protection Regulation
+3,GDPR,Drivers License ID Number,General Data Protection Regulation
+4,PII,Drivers License ID Number,Personally Identifiable Information
+5,PII,Social Security Number,Personally Identifiable Information
+6,PII,Passport Number,Personally Identifiable Information
+7,PII,Taxpayer Number,Personally Identifiable Information
+8,GDPR,Taxpayer Number,General Data Protection Regulation
+9,GDPR,National Insurance Number,General Data Protection Regulation
+10,GDPR,Electoral Roll Number,General Data Protection Regulation
+11,PHI,Medical Beneficiary Number,Protected Health Information
+12,PII,Medical Beneficiary Number,Personally Identifiable Information
+13,PHI,Healthcare Common Procedure Coding System,Protected Health Information
+14,PII,Healthcare Common Procedure Coding System,Personally Identifiable Information
+15,UDI,Unique Device Identifier,Unique Device Identifier
+16,HIPAA,Health Insurance Claim Number,Health Insurance Portability and Accountability Act
+17,PHI,National Drug Code,Protected Health Information
+18,PII,National Drug Code,Personally Identifiable Information
+19,,National Provider Identifier,
+20,PHI,Drug Enforcement Agency Registration Number,Protected Health Information
+21,GDPR,National Health Service Number,General Data Protection Regulation
+22,PII,National Health Service Number,Personally Identifiable Information
+23,PCI-DSS,Credit Card Number,Payment Card Industry Data Security Standard
+24,PII,Credit Card Number,Personally Identifiable Information
+25,GDPR,Credit Card Number,General Data Protection Regulation
+26,PCI-DSS,Bank Account Numbers,Payment Card Industry Data Security Standard
+27,PII,Bank Account Numbers,Personally Identifiable Information
+28,PII,Email Address,Personally Identifiable Information
+29,PII,GPS Coordinates,Personally Identifiable Information
+30,PII,VIN Number,Personally Identifiable Information
+31,PII,Local MAC Address,Personally Identifiable Information
+32,PII,Universal MAC Address,Personally Identifiable Information
+33,PII,DNS Name,Personally Identifiable Information
+34,SOC 2,PGP Keys,Service Organization Control 2
+35,SOC 2,AWS Secrets,Service Organization Control 2
+36,SOC 2,OpenSSH Keys,Service Organization Control 2
+37,SOC 2,pem Keys,Service Organization Control 2
+38,SOC 2,ppk Keys,Service Organization Control 2
+39,SOC 2,XML Keys ,Service Organization Control 2
+40,SOC 2,Generic Secret Key,Service Organization Control 2
+41,SOC 2,Github Access Key,Service Organization Control 2
+42,SOC 2,Google API key,Service Organization Control 2
