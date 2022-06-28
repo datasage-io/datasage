@@ -2,6 +2,7 @@ package storage
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"os"
 
@@ -38,8 +39,64 @@ func (into InternalStorage) InsertDefaultData(tags []*Tag, classes []*Class) err
 
 	return err
 }
-func NewInternalStorage(dsn string) (InternalStorage, error) {
 
+func (into InternalStorage) SetSchemaData(dpDbDatabase DpDbDatabase) error {
+
+	dbInsert, err := into.SqliteConnc.Prepare(`
+	INSERT INTO dp_databases ("name","type")
+	VALUES (?,?);
+	`)
+	if err != nil {
+		log.Println("error1", err.Error())
+		return err
+	}
+	dpDb, err := dbInsert.Exec(dpDbDatabase.Name, dpDbDatabase.Type)
+	if err != nil {
+		log.Println("error2", err.Error())
+		return err
+	}
+	dpDbId, err := dpDb.LastInsertId()
+	for _, table := range dpDbDatabase.DpDbTables {
+		tableInsert, err := into.SqliteConnc.Prepare(`
+		INSERT INTO dp_db_tables ("name","id")
+		 VALUES (?,?);
+		`)
+		if err != nil {
+			log.Println("error3", err.Error())
+			continue
+		}
+
+		fmt.Println("INSERT INTO dp_db_tables :", table.Name, dpDbId)
+		dbDbTable, err := tableInsert.Exec(table.Name, dpDbId)
+		if err != nil {
+			log.Println("error3b", err.Error())
+			continue
+		}
+		dbDbTableId, err := dbDbTable.LastInsertId()
+		for _, column := range table.DpDbColumns {
+			columnInsert, err := into.SqliteConnc.Prepare(`
+			INSERT INTO dp_db_columns ("dp_db_id","dp_db_table_id","column_name","column_type","column_comment" )
+			 VALUES (?,?,?,?,?);
+			`)
+			if err != nil {
+				log.Println("error4", err.Error())
+				continue
+			}
+			fmt.Println("INSERT INTO dp_db_columns:", dpDbId, dbDbTableId, column.ColumnName, column.ColumnType, column.ColumnComment)
+			_, err = columnInsert.Exec(dpDbId, dbDbTableId, column.ColumnName, column.ColumnType, column.ColumnComment)
+			if err != nil {
+				log.Println("error5", err.Error())
+				log.Println(err.Error())
+				continue
+			}
+		}
+
+	}
+	return err
+}
+
+func NewInternalStorage(dsn string) (InternalStorage, error) {
+	log.Println("NewInternalStorage enter")
 	var isnew bool
 	_, err := os.Stat(dsn)
 	if os.IsNotExist(err) {
@@ -64,6 +121,7 @@ func NewInternalStorage(dsn string) (InternalStorage, error) {
 		err = insto.InsertDefaultData(tags, classes)
 
 	}
+	log.Println("NewInternalStorage exit")
 	return insto, err
 
 }
