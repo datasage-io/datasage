@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+option go_package = "/grpc_config";
+
+service DataSageServer {
+    rpc LogSend(Log) returns (Null) {};
+}
+
+message Log {
+    string body = 1;
+}
+
+message Null {
+}
