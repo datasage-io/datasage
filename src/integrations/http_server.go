@@ -26,12 +26,15 @@ func loghandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, `{status: "not ok", "error": %v}`, err)
 		return
 	}
-	config.StreamLogToAll(string(body))
-	if err != nil {
-		fmt.Fprintf(w, `{status: "not ok", "error": %v}`, err)
-		return
-	}
-	fmt.Fprintf(w, `{status : "ok"}`)
+	go func(http.ResponseWriter) {
+		config.StreamLogToAll(string(body))
+		if err != nil {
+			fmt.Fprintf(w, `{status: "not ok", "error": %v}`, err)
+			return
+		}
+		fmt.Fprintf(w, `{status : "ok"}`)
+	}(w)
+
 }
 func RunServer() {
 
