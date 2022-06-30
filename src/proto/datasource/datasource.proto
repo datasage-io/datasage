@@ -8,8 +8,8 @@ import "google/protobuf/timestamp.proto";
 
 //RPC Service 
 service Datasource {
-   rpc ListDatasources ( listDatasourceRequest ) returns ( listDatasourceResponse );
-   rpc DeleteDatasources ( deleteDatasourceRequest ) returns ( deleteDatasourceResponse );
+   rpc ListDatasources ( listDatasourceRequest ) returns ( stream listDatasourceResponse );
+   rpc DeleteDatasources ( deleteDatasourceRequest ) returns ( stream deleteDatasourceResponse );
 }
 
 //Request for List Datasource
