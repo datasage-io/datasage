@@ -16,7 +16,7 @@ service Datasource {
 //Request for Create Datasource 
 message addDatasourceRequest {
    string                      data_domain     = 1;  
-   string                      ds_name            = 2;
+   string                      ds_name         = 2;
    string                      ds_description  = 3;
    string                      ds_type         = 4;
    string                      ds_version      = 5;
