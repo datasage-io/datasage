@@ -22,6 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DatasourceClient interface {
+	AddDatasources(ctx context.Context, in *AddDatasourceRequest, opts ...grpc.CallOption) (Datasource_AddDatasourcesClient, error)
 	ListDatasources(ctx context.Context, in *ListDatasourceRequest, opts ...grpc.CallOption) (Datasource_ListDatasourcesClient, error)
 	DeleteDatasources(ctx context.Context, in *DeleteDatasourceRequest, opts ...grpc.CallOption) (Datasource_DeleteDatasourcesClient, error)
 }
@@ -34,8 +35,40 @@ func NewDatasourceClient(cc grpc.ClientConnInterface) DatasourceClient {
 	return &datasourceClient{cc}
 }
 
+func (c *datasourceClient) AddDatasources(ctx context.Context, in *AddDatasourceRequest, opts ...grpc.CallOption) (Datasource_AddDatasourcesClient, error) {
+	stream, err := c.cc.NewStream(ctx, &Datasource_ServiceDesc.Streams[0], "/datasource.Datasource/AddDatasources", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &datasourceAddDatasourcesClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Datasource_AddDatasourcesClient interface {
+	Recv() (*MessageResponse, error)
+	grpc.ClientStream
+}
+
+type datasourceAddDatasourcesClient struct {
+	grpc.ClientStream
+}
+
+func (x *datasourceAddDatasourcesClient) Recv() (*MessageResponse, error) {
+	m := new(MessageResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 func (c *datasourceClient) ListDatasources(ctx context.Context, in *ListDatasourceRequest, opts ...grpc.CallOption) (Datasource_ListDatasourcesClient, error) {
-	stream, err := c.cc.NewStream(ctx, &Datasource_ServiceDesc.Streams[0], "/datasource.Datasource/ListDatasources", opts...)
+	stream, err := c.cc.NewStream(ctx, &Datasource_ServiceDesc.Streams[1], "/datasource.Datasource/ListDatasources", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +100,7 @@ func (x *datasourceListDatasourcesClient) Recv() (*ListDatasourceResponse, error
 }
 
 func (c *datasourceClient) DeleteDatasources(ctx context.Context, in *DeleteDatasourceRequest, opts ...grpc.CallOption) (Datasource_DeleteDatasourcesClient, error) {
-	stream, err := c.cc.NewStream(ctx, &Datasource_ServiceDesc.Streams[1], "/datasource.Datasource/DeleteDatasources", opts...)
+	stream, err := c.cc.NewStream(ctx, &Datasource_ServiceDesc.Streams[2], "/datasource.Datasource/DeleteDatasources", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +115,7 @@ func (c *datasourceClient) DeleteDatasources(ctx context.Context, in *DeleteData
 }
 
 type Datasource_DeleteDatasourcesClient interface {
-	Recv() (*DeleteDatasourceResponse, error)
+	Recv() (*MessageResponse, error)
 	grpc.ClientStream
 }
 
@@ -90,8 +123,8 @@ type datasourceDeleteDatasourcesClient struct {
 	grpc.ClientStream
 }
 
-func (x *datasourceDeleteDatasourcesClient) Recv() (*DeleteDatasourceResponse, error) {
-	m := new(DeleteDatasourceResponse)
+func (x *datasourceDeleteDatasourcesClient) Recv() (*MessageResponse, error) {
+	m := new(MessageResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -102,6 +135,7 @@ func (x *datasourceDeleteDatasourcesClient) Recv() (*DeleteDatasourceResponse, e
 // All implementations must embed UnimplementedDatasourceServer
 // for forward compatibility
 type DatasourceServer interface {
+	AddDatasources(*AddDatasourceRequest, Datasource_AddDatasourcesServer) error
 	ListDatasources(*ListDatasourceRequest, Datasource_ListDatasourcesServer) error
 	DeleteDatasources(*DeleteDatasourceRequest, Datasource_DeleteDatasourcesServer) error
 	mustEmbedUnimplementedDatasourceServer()
@@ -111,6 +145,9 @@ type DatasourceServer interface {
 type UnimplementedDatasourceServer struct {
 }
 
+func (UnimplementedDatasourceServer) AddDatasources(*AddDatasourceRequest, Datasource_AddDatasourcesServer) error {
+	return status.Errorf(codes.Unimplemented, "method AddDatasources not implemented")
+}
 func (UnimplementedDatasourceServer) ListDatasources(*ListDatasourceRequest, Datasource_ListDatasourcesServer) error {
 	return status.Errorf(codes.Unimplemented, "method ListDatasources not implemented")
 }
@@ -128,6 +165,27 @@ type UnsafeDatasourceServer interface {
 
 func RegisterDatasourceServer(s grpc.ServiceRegistrar, srv DatasourceServer) {
 	s.RegisterService(&Datasource_ServiceDesc, srv)
+}
+
+func _Datasource_AddDatasources_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(AddDatasourceRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(DatasourceServer).AddDatasources(m, &datasourceAddDatasourcesServer{stream})
+}
+
+type Datasource_AddDatasourcesServer interface {
+	Send(*MessageResponse) error
+	grpc.ServerStream
+}
+
+type datasourceAddDatasourcesServer struct {
+	grpc.ServerStream
+}
+
+func (x *datasourceAddDatasourcesServer) Send(m *MessageResponse) error {
+	return x.ServerStream.SendMsg(m)
 }
 
 func _Datasource_ListDatasources_Handler(srv interface{}, stream grpc.ServerStream) error {
@@ -160,7 +218,7 @@ func _Datasource_DeleteDatasources_Handler(srv interface{}, stream grpc.ServerSt
 }
 
 type Datasource_DeleteDatasourcesServer interface {
-	Send(*DeleteDatasourceResponse) error
+	Send(*MessageResponse) error
 	grpc.ServerStream
 }
 
@@ -168,7 +226,7 @@ type datasourceDeleteDatasourcesServer struct {
 	grpc.ServerStream
 }
 
-func (x *datasourceDeleteDatasourcesServer) Send(m *DeleteDatasourceResponse) error {
+func (x *datasourceDeleteDatasourcesServer) Send(m *MessageResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
@@ -180,6 +238,11 @@ var Datasource_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*DatasourceServer)(nil),
 	Methods:     []grpc.MethodDesc{},
 	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "AddDatasources",
+			Handler:       _Datasource_AddDatasources_Handler,
+			ServerStreams: true,
+		},
 		{
 			StreamName:    "ListDatasources",
 			Handler:       _Datasource_ListDatasources_Handler,

@@ -8,14 +8,29 @@ import "google/protobuf/timestamp.proto";
 
 //RPC Service 
 service Datasource {
+   rpc AddDatasources ( addDatasourceRequest ) returns ( stream messageResponse );
    rpc ListDatasources ( listDatasourceRequest ) returns ( stream listDatasourceResponse );
-   rpc DeleteDatasources ( deleteDatasourceRequest ) returns ( stream deleteDatasourceResponse );
+   rpc DeleteDatasources ( deleteDatasourceRequest ) returns ( stream messageResponse );
+}
+
+//Request for Create Datasource 
+message addDatasourceRequest {
+   string                      data_domain     = 1;  
+   string                      ds_name            = 2;
+   string                      ds_description  = 3;
+   string                      ds_type         = 4;
+   string                      ds_version      = 5;
+   string                      ds_key          = 6;       
+   string                      host            = 7;  
+   string                      port            = 8;
+   string                      user            = 9;
+   string                      password        = 10;
 }
 
 //Request for List Datasource
 message listDatasourceRequest {
    string host = 1;  
-   int64  port = 2;
+   string port = 2;
    string user = 3;
    string password = 4;
 }
@@ -30,8 +45,8 @@ message deleteDatasourceRequest {
     int64 id = 1;
 }
 
-//Response for Delete Datasource
-message deleteDatasourceResponse {
+//Response for  Datasource
+message messageResponse {
     string message = 1;
 }
 
