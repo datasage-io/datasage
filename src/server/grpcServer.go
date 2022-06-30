@@ -25,13 +25,27 @@ type datasourceServer struct {
 	ds.DatasourceServer
 }
 
+func (d *datasourceServer) AddDatasources(in *ds.AddDatasourceRequest, stream ds.Datasource_AddDatasourcesServer) error {
+	return nil
+}
+
+func (d *datasourceServer) ListDatasources(in *ds.ListDatasourceRequest, stream ds.Datasource_ListDatasourcesServer) error {
+	return nil
+}
+
+func (d *datasourceServer) DeleteDatasources(in *ds.DeleteDatasourceRequest, stream ds.Datasource_DeleteDatasourcesServer) error {
+	return nil
+}
+
 // ================= //
 // == gRPC Server == //
 // ================= //
 
 //GetNewServer - gRPC Server
 func GetNewServer() *grpc.Server {
-	log.Info().Msg("gRPC Server Started....")
+	log.Info().Msg("// ================= //")
+	log.Info().Msg("// == gRPC Server Started == //")
+	log.Info().Msg("// ================= //")
 	s := grpc.NewServer()
 	grpc_health_v1.RegisterHealthServer(s, health.NewServer())
 
