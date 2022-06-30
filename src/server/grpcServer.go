@@ -31,9 +31,15 @@ type datasourceServer struct {
 
 //GetNewServer - gRPC Server
 func GetNewServer() *grpc.Server {
-
+	log.Info().Msg("gRPC Server Started....")
 	s := grpc.NewServer()
 	grpc_health_v1.RegisterHealthServer(s, health.NewServer())
+
+	//Create Server Instance
+	datasourceServer := &datasourceServer{}
+
+	//Register gRPC Server
+	ds.RegisterDatasourceServer(s, datasourceServer)
 
 	reflection.Register(s)
 
