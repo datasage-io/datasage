@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"sync"
 
 	logger "github.com/datasage-io/datasage/src/logger"
@@ -26,14 +27,17 @@ type datasourceServer struct {
 }
 
 func (d *datasourceServer) AddDatasources(in *ds.AddDatasourceRequest, stream ds.Datasource_AddDatasourcesServer) error {
+	fmt.Println("Add Datasource Request Data --- ", in)
 	return nil
 }
 
 func (d *datasourceServer) ListDatasources(in *ds.ListDatasourceRequest, stream ds.Datasource_ListDatasourcesServer) error {
+	fmt.Println("List Datasource Requested Data --- ", in)
 	return nil
 }
 
 func (d *datasourceServer) DeleteDatasources(in *ds.DeleteDatasourceRequest, stream ds.Datasource_DeleteDatasourcesServer) error {
+	fmt.Println("Delete Datasource Requested Data --- ", in)
 	return nil
 }
 

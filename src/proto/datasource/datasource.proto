@@ -19,8 +19,7 @@ message addDatasourceRequest {
    string                      ds_name         = 2;
    string                      ds_description  = 3;
    string                      ds_type         = 4;
-   string                      ds_version      = 5;
-   string                      ds_key          = 6;       
+   string                      ds_version      = 5;     
    string                      host            = 7;  
    string                      port            = 8;
    string                      user            = 9;
