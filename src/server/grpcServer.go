@@ -6,6 +6,7 @@ import (
 
 	logger "github.com/datasage-io/datasage/src/logger"
 	ds "github.com/datasage-io/datasage/src/proto/datasource"
+	tag "github.com/datasage-io/datasage/src/proto/tag"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
@@ -41,6 +42,29 @@ func (d *datasourceServer) DeleteDatasources(in *ds.DeleteDatasourceRequest, str
 	return nil
 }
 
+// ======================= //
+// == Tag Service == //
+// ===================== //
+
+type tagServer struct {
+	tag.TagServer
+}
+
+func (t *tagServer) AddTag(in *tag.CreateTagRequest, stream tag.Tag_AddTagServer) error {
+	fmt.Println("Add Tag Request Data --- ", in)
+	return nil
+}
+
+func (t *tagServer) ListTag(in *tag.ListTagRequest, stream tag.Tag_ListTagServer) error {
+	fmt.Println("List Tag Requested Data --- ", in)
+	return nil
+}
+
+func (t *tagServer) DeleteTag(in *tag.DeleteTagRequest, stream tag.Tag_DeleteTagServer) error {
+	fmt.Println("Delete Tag Requested Data --- ", in)
+	return nil
+}
+
 // ================= //
 // == gRPC Server == //
 // ================= //
@@ -55,9 +79,11 @@ func GetNewServer() *grpc.Server {
 
 	//Create Server Instance
 	datasourceServer := &datasourceServer{}
+	tagServer := &tagServer{}
 
 	//Register gRPC Server
 	ds.RegisterDatasourceServer(s, datasourceServer)
+	tag.RegisterTagServer(s, tagServer)
 
 	reflection.Register(s)
 
