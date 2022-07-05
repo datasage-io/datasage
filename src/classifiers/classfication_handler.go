@@ -9,14 +9,34 @@ import (
 	"github.com/datasage-io/datasage/src/storage"
 )
 
-func Run() {
+type DpDataSource struct {
+	Datadomain   string `json:"Datadomain"`
+	Dsname       string `json:"Dsname"`
+	Dsdecription string `json:"Dsdecription"`
+	Dstype       string `json:"Dstype"`
+	DsKey        string `json:"DsKey"`
+	Dsversion    string `json:"Dsversion"`
+	Host         string `json:"Host"`
+	Port         string `json:"Port"`
+	User         string `json:"User"`
+	Password     string `json:"Password"`
+}
+
+func Run(dpDataSource DpDataSource) {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	//Fetch MetaData
+	/*
+		adpt, err := adaptors.New(adaptors.AdaptorConfig{
+			Type:     "mysql",
+			Username: "user1",
+			Password: "Accu0104#",
+			Host:     "localhost"})
+	*/
 	adpt, err := adaptors.New(adaptors.AdaptorConfig{
-		Type:     "mysql",
-		Username: "user1",
-		Password: "Accu0104#",
-		Host:     "localhost"})
+		Type:     dpDataSource.Dstype,
+		Username: dpDataSource.User,
+		Password: dpDataSource.Password,
+		Host:     dpDataSource.Host})
 
 	if err != nil {
 		log.Fatal(err.Error())
@@ -31,7 +51,7 @@ func Run() {
 		log.Println(err.Error())
 	}
 
-	st, err := storage.New(storage.StorageConfig{Type: "internal", Path: "datasage.db"})
+	st, err := storage.New(storage.StorageConfig{Type: "internal", Path: "datasageD.db"})
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -69,21 +89,36 @@ func Run() {
 					log.Println(err.Error())
 					continue
 				}
-				relatedtags, err := st.GetAssociatedTags(colName)
-				if err != nil {
-					log.Println(err.Error())
+				relatedtags, _ := st.GetAssociatedTags(colName)
+				relatedclasses, _ := st.GetAssociatedClasses(colName)
+
+				//if err != nil {
+				//	log.Println(err.Error())
+				//}
+				tags := ""
+				classes := ""
+				if len(relatedclasses) > 0 {
+					for _, relatedclass := range relatedclasses {
+						log.Println("Class:= ", relatedclass.Class)
+						classes = classes + ";" + relatedclass.Class
+					}
 				}
 				if len(relatedtags) > 0 {
-
 					for _, relatedtag := range relatedtags {
-						log.Println("DB name:= ", sc.Name, "Table Name:= ", tb.Name, "columns:= ", cols, "TagName:", relatedtag.TagName, "Rule:", relatedtag.Rule)
+						log.Println("TagName:", relatedtag.TagName)
+						tags = tags + ";" + relatedtag.TagName
 					}
+				} else {
+					continue
+
 				}
 
 				col := storage.DpDbColumn{
 					ColumnName:    colName,
 					ColumnType:    cols.ColumnType,
 					ColumnComment: cols.ColumnComment,
+					Tags:          tags,
+					Classes:       classes,
 				}
 				dpDbColumns = append(dpDbColumns, col)
 			}
@@ -108,6 +143,7 @@ func Run() {
 		if err != nil {
 			fmt.Println(err)
 		}
+
 	}
 
 }
