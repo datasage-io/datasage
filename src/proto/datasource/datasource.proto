@@ -28,10 +28,13 @@ message addDatasourceRequest {
 
 //Request for List Datasource
 message listDatasourceRequest {
-   string host = 1;  
-   string port = 2;
-   string user = 3;
+   string host     = 1;  
+   string port     = 2;
+   string user     = 3;
    string password = 4;
+   string first    = 5;
+   string last     = 6;
+   string all      = 7;
 }
 
 //Response for List Datasource
@@ -41,7 +44,7 @@ message listDatasourceResponse {
 
 //Request for Delete Datasource
 message deleteDatasourceRequest {
-    int64 id = 1;
+    string id = 1;
 }
 
 //Response for  Datasource
@@ -50,13 +53,14 @@ message messageResponse {
 }
 
 message ListAllDatasource {
-   string                      data_domain     = 1;  
-   string                      name            = 2;
-   string                      ds_description  = 3;
-   string                      ds_type         = 4;
-   string                      ds_version      = 5;
-   string                      ds_key          = 6;       
-   google.protobuf.Timestamp   created_at      = 7;
-   google.protobuf.Timestamp   deleted         = 8;
+   string                      id              = 1;
+   string                      data_domain     = 2;  
+   string                      name            = 3;
+   string                      ds_description  = 4;
+   string                      ds_type         = 5;
+   string                      ds_version      = 6;
+   string                      ds_key          = 7;       
+   google.protobuf.Timestamp   created_at      = 8;
+   google.protobuf.Timestamp   deleted         = 9;
 }
 
