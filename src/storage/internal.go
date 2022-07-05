@@ -2,7 +2,6 @@ package storage
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"os"
 
@@ -28,6 +27,7 @@ func (into InternalStorage) InsertDefaultData(tags []*Tag, classes []*Class) err
 	for _, t := range tags {
 		_, err = tagInsert.Exec(t.Id, t.TagName, t.Rule, t.Description)
 	}
+	tagInsert.Close()
 
 	classInsert, err := into.SqliteConnc.Prepare(`
 	INSERT INTO class ("id","description","rule","class")
@@ -36,7 +36,7 @@ func (into InternalStorage) InsertDefaultData(tags []*Tag, classes []*Class) err
 	for _, c := range classes {
 		_, err = classInsert.Exec(c.Id, c.Description, c.Rule, c.Class)
 	}
-
+	classInsert.Close()
 	return err
 }
 
@@ -56,9 +56,13 @@ func (into InternalStorage) SetSchemaData(dpDbDatabase DpDbDatabase) error {
 		return err
 	}
 	dpDbId, err := dpDb.LastInsertId()
+
+	dbInsert.Close()
+
 	for _, table := range dpDbDatabase.DpDbTables {
+
 		tableInsert, err := into.SqliteConnc.Prepare(`
-		INSERT INTO dp_db_tables ("name","id")
+		INSERT INTO dp_db_tables ("name","dp_db_id")
 		 VALUES (?,?);
 		`)
 		if err != nil {
@@ -66,30 +70,36 @@ func (into InternalStorage) SetSchemaData(dpDbDatabase DpDbDatabase) error {
 			continue
 		}
 
-		fmt.Println("INSERT INTO dp_db_tables :", table.Name, dpDbId)
+		//fmt.Println("INSERT INTO dp_db_tables :", table.Name, dpDbId)
 		dbDbTable, err := tableInsert.Exec(table.Name, dpDbId)
 		if err != nil {
 			log.Println("error3b", err.Error())
 			continue
 		}
+
 		dbDbTableId, err := dbDbTable.LastInsertId()
+		tableInsert.Close()
+
+		columnInsert, err := into.SqliteConnc.Prepare(`
+		INSERT INTO dp_db_columns ("dp_db_id","dp_db_table_id","column_name","column_type","column_comment","Tags","Classes")
+		 VALUES (?,?,?,?,?,?,?);
+		`)
+		if err != nil {
+			log.Println("error4", err.Error())
+			continue
+		}
+
 		for _, column := range table.DpDbColumns {
-			columnInsert, err := into.SqliteConnc.Prepare(`
-			INSERT INTO dp_db_columns ("dp_db_id","dp_db_table_id","column_name","column_type","column_comment" )
-			 VALUES (?,?,?,?,?);
-			`)
-			if err != nil {
-				log.Println("error4", err.Error())
-				continue
-			}
-			fmt.Println("INSERT INTO dp_db_columns:", dpDbId, dbDbTableId, column.ColumnName, column.ColumnType, column.ColumnComment)
-			_, err = columnInsert.Exec(dpDbId, dbDbTableId, column.ColumnName, column.ColumnType, column.ColumnComment)
+
+			//fmt.Println("INSERT INTO dp_db_columns:", dpDbId, dbDbTableId, column.ColumnName, column.ColumnType, column.ColumnComment)
+			_, err = columnInsert.Exec(dpDbId, dbDbTableId, column.ColumnName, column.ColumnType, column.ColumnComment, column.Tags, column.Classes)
 			if err != nil {
 				log.Println("error5", err.Error())
-				log.Println(err.Error())
-				continue
+				//	continue
 			}
+
 		}
+		columnInsert.Close()
 
 	}
 	return err
@@ -176,4 +186,21 @@ func (insto InternalStorage) GetAssociatedTags(class string) ([]Tag, error) {
 	}
 
 	return tags, err
+}
+
+func (insto InternalStorage) GetAssociatedClasses(rule string) ([]Class, error) {
+
+	classes := []Class{}
+	rows, err := insto.SqliteConnc.Query("SELECT id,description,rule,class FROM class Where rule = ?", rule)
+	if err != nil {
+		return classes, err
+	}
+	for rows.Next() {
+		tempClass := Class{}
+		err = rows.Scan(&tempClass.Id, &tempClass.Description,
+			&tempClass.Rule, &tempClass.Class)
+		classes = append(classes, tempClass)
+	}
+
+	return classes, err
 }

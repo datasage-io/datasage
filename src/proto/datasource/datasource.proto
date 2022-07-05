@@ -1,0 +1,63 @@
+syntax = "proto3";
+ 
+package datasource;
+ 
+option go_package = "github.com/datasage-io/datasage/proto/datasource";
+ 
+import "google/protobuf/timestamp.proto";
+
+//RPC Service 
+service Datasource {
+   rpc AddDatasources ( addDatasourceRequest ) returns ( stream messageResponse );
+   rpc ListDatasources ( listDatasourceRequest ) returns ( stream listDatasourceResponse );
+   rpc DeleteDatasources ( deleteDatasourceRequest ) returns ( stream messageResponse );
+}
+
+//Request for Create Datasource 
+message addDatasourceRequest {
+   string                      data_domain     = 1;  
+   string                      ds_name         = 2;
+   string                      ds_description  = 3;
+   string                      ds_type         = 4;
+   string                      ds_version      = 5;
+   string                      ds_key          = 6;       
+   string                      host            = 7;  
+   string                      port            = 8;
+   string                      user            = 9;
+   string                      password        = 10;
+}
+
+//Request for List Datasource
+message listDatasourceRequest {
+   string host = 1;  
+   string port = 2;
+   string user = 3;
+   string password = 4;
+}
+
+//Response for List Datasource
+message listDatasourceResponse {
+   repeated ListAllDatasource list_all_datasources = 1;
+}
+
+//Request for Delete Datasource
+message deleteDatasourceRequest {
+    int64 id = 1;
+}
+
+//Response for  Datasource
+message messageResponse {
+    string message = 1;
+}
+
+message ListAllDatasource {
+   string                      data_domain     = 1;  
+   string                      name            = 2;
+   string                      ds_description  = 3;
+   string                      ds_type         = 4;
+   string                      ds_version      = 5;
+   string                      ds_key          = 6;       
+   google.protobuf.Timestamp   created_at      = 7;
+   google.protobuf.Timestamp   deleted         = 8;
+}
+

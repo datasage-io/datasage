@@ -26,25 +26,24 @@ CREATE TABLE IF NOT EXISTS "tag" (
 	PRIMARY KEY("id")
 );
 CREATE TABLE IF NOT EXISTS "dp_databases" (
-	"id" INTEGER AUTO_INCREMENT,
+	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
 	"name" TEXT,
-	"type" TEXT,
-	PRIMARY KEY ("id")
+	"type" TEXT
   );
   CREATE TABLE IF NOT EXISTS  "dp_db_tables" (
-	"id" INTEGER AUTO_INCREMENT,
+	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
 	"name" TEXT DEFAULT NULL,
-	"dp_db_id" INTEGER DEFAULT NULL,
-	PRIMARY KEY ("id")
+	"dp_db_id" INTEGER DEFAULT NULL
   );
   CREATE TABLE IF NOT EXISTS  "dp_db_columns" (
-	"id" INTEGER AUTO_INCREMENT,
+	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
 	"dp_db_id" INTEGER DEFAULT NULL,
 	"dp_db_table_id" INTEGER NOT NULL,
 	"column_name" TEXT NOT NULL,
 	"column_type" TEXT NOT NULL,
 	"column_comment" TEXT NOT NULL,
-	PRIMARY KEY ("id") 
+	"Tags" TEXT NOT NULL,
+	"Classes" TEXT NOT NULL
   ) ;
 `
 
@@ -66,6 +65,7 @@ type Storage interface {
 	GetClasses() ([]Class, error)
 	GetTags() ([]Tag, error)
 	GetAssociatedTags(string) ([]Tag, error)
+	GetAssociatedClasses(string) ([]Class, error)
 	SetSchemaData(DpDbDatabase) error
 }
 
@@ -126,6 +126,8 @@ type DpDbColumn struct {
 	ColumnName    string `json:"column_name"`
 	ColumnType    string `json:"ColumnType"`
 	ColumnComment string `json:"Column_Comment"`
+	Tags          string `json:"Tags"`
+	Classes       string `json:"Classes"`
 }
 
 type SensitiveElementTag struct {
