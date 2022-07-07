@@ -53,14 +53,13 @@ message messageResponse {
 }
 
 message ListAllDatasource {
-   string                      id              = 1;
-   string                      data_domain     = 2;  
-   string                      name            = 3;
+   string                      ds_id           = 1;
+   string                      ds_datadomain   = 2;  
+   string                      ds_name         = 3;
    string                      ds_description  = 4;
    string                      ds_type         = 5;
    string                      ds_version      = 6;
    string                      ds_key          = 7;       
    google.protobuf.Timestamp   created_at      = 8;
-   google.protobuf.Timestamp   deleted         = 9;
 }
 
