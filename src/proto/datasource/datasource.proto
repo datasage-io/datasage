@@ -28,13 +28,13 @@ message addDatasourceRequest {
 
 //Request for List Datasource
 message listDatasourceRequest {
-   string host     = 1;  
-   string port     = 2;
-   string user     = 3;
-   string password = 4;
-   string first    = 5;
-   string last     = 6;
-   string all      = 7;
+   string host              = 1;  
+   string port              = 2;
+   string user              = 3;
+   string password          = 4;
+   string first             = 5;
+   string last              = 6;
+   string all               = 7;
 }
 
 //Response for List Datasource
