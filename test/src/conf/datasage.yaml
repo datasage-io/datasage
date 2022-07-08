@@ -28,13 +28,13 @@ adaptors:
 
 integrations:
   kafka:
-    - topic: dblogs
+    - topic: datasage-logs
       broker: 127.0.0.1
       port: 9092
   rpc:
     - host: 127.0.0.1
       port: 2222
   http:
-    - endpoint: https://accuknox.com/service/log
+    - endpoint: https://datasage.com/service/log
       method: post
       

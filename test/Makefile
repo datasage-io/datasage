@@ -2,7 +2,7 @@ all: run-kafka-server run-grpc-server
 
 run-kafka-server:
 	docker-compose -f ./resources/docker-compose.yaml up -d
-	docker exec broker kafka-topics --bootstrap-server broker:9092 --create --topic dblogs
+	docker exec broker kafka-topics --bootstrap-server broker:9092 --create --topic datasage-logs
 
 run-grpc-server:
 	go run server/grpc_server.go
