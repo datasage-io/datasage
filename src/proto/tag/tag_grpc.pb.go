@@ -36,7 +36,7 @@ func NewTagClient(cc grpc.ClientConnInterface) TagClient {
 }
 
 func (c *tagClient) AddTag(ctx context.Context, in *CreateTagRequest, opts ...grpc.CallOption) (Tag_AddTagClient, error) {
-	stream, err := c.cc.NewStream(ctx, &Tag_ServiceDesc.Streams[0], "/datasource.Tag/AddTag", opts...)
+	stream, err := c.cc.NewStream(ctx, &Tag_ServiceDesc.Streams[0], "/tag.Tag/AddTag", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func (x *tagAddTagClient) Recv() (*TagMessageResponse, error) {
 }
 
 func (c *tagClient) ListTag(ctx context.Context, in *ListTagRequest, opts ...grpc.CallOption) (Tag_ListTagClient, error) {
-	stream, err := c.cc.NewStream(ctx, &Tag_ServiceDesc.Streams[1], "/datasource.Tag/ListTag", opts...)
+	stream, err := c.cc.NewStream(ctx, &Tag_ServiceDesc.Streams[1], "/tag.Tag/ListTag", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func (x *tagListTagClient) Recv() (*ListTagResponse, error) {
 }
 
 func (c *tagClient) DeleteTag(ctx context.Context, in *DeleteTagRequest, opts ...grpc.CallOption) (Tag_DeleteTagClient, error) {
-	stream, err := c.cc.NewStream(ctx, &Tag_ServiceDesc.Streams[2], "/datasource.Tag/DeleteTag", opts...)
+	stream, err := c.cc.NewStream(ctx, &Tag_ServiceDesc.Streams[2], "/tag.Tag/DeleteTag", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -234,7 +234,7 @@ func (x *tagDeleteTagServer) Send(m *TagMessageResponse) error {
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Tag_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "datasource.Tag",
+	ServiceName: "tag.Tag",
 	HandlerType: (*TagServer)(nil),
 	Methods:     []grpc.MethodDesc{},
 	Streams: []grpc.StreamDesc{
