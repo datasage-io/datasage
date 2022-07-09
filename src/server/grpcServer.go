@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	logger "github.com/datasage-io/datasage/src/logger"
+	class "github.com/datasage-io/datasage/src/proto/class"
 	ds "github.com/datasage-io/datasage/src/proto/datasource"
 	tag "github.com/datasage-io/datasage/src/proto/tag"
 	"github.com/rs/zerolog"
@@ -65,6 +66,29 @@ func (t *tagServer) DeleteTag(in *tag.DeleteTagRequest, stream tag.Tag_DeleteTag
 	return nil
 }
 
+// ======================= //
+// == Class Service == //
+// ===================== //
+
+type classServer struct {
+	class.ClassServer
+}
+
+func (c *classServer) AddClass(in *class.CreateClassRequest, stream class.Class_AddClassServer) error {
+	fmt.Println("Add Class Request Data --- ", in)
+	return nil
+}
+
+func (c *classServer) ListClass(in *class.ListClassRequest, stream class.Class_ListClassServer) error {
+	fmt.Println("List Class Requested Data --- ", in)
+	return nil
+}
+
+func (c *classServer) DeleteClass(in *class.DeleteClassRequest, stream class.Class_DeleteClassServer) error {
+	fmt.Println("Delete CLass Requested Data --- ", in)
+	return nil
+}
+
 // ================= //
 // == gRPC Server == //
 // ================= //
@@ -80,10 +104,12 @@ func GetNewServer() *grpc.Server {
 	//Create Server Instance
 	datasourceServer := &datasourceServer{}
 	tagServer := &tagServer{}
+	classServer := &classServer{}
 
 	//Register gRPC Server
 	ds.RegisterDatasourceServer(s, datasourceServer)
 	tag.RegisterTagServer(s, tagServer)
+	class.RegisterClassServer(s, classServer)
 
 	reflection.Register(s)
 
