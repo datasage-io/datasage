@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.12.4
-// source: tag.proto
+// source: tag/tag.proto
 
 package tag
 
@@ -254,5 +254,5 @@ var Tag_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "tag.proto",
+	Metadata: "tag/tag.proto",
 }

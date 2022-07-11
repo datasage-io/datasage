@@ -4,7 +4,6 @@ package datasource;
  
 option go_package = "github.com/datasage-io/datasage/proto/datasource";
  
-import "google/protobuf/timestamp.proto";
 
 //RPC Service 
 service Datasource {
@@ -28,13 +27,7 @@ message addDatasourceRequest {
 
 //Request for List Datasource
 message listDatasourceRequest {
-   string host              = 1;  
-   string port              = 2;
-   string user              = 3;
-   string password          = 4;
-   string first             = 5;
-   string last              = 6;
-   string all               = 7;
+   string all  = 1;
 }
 
 //Response for List Datasource
@@ -60,6 +53,6 @@ message ListAllDatasource {
    string                      ds_type         = 5;
    string                      ds_version      = 6;
    string                      ds_key          = 7;       
-   google.protobuf.Timestamp   created_at      = 8;
+   string                      created_at      = 8;
 }
 

@@ -4,7 +4,6 @@ package tag;
  
 option go_package = "github.com/datasage-io/datasage/proto/tag";
  
-import "google/protobuf/timestamp.proto";
 
 //RPC Service 
 service Tag {
@@ -37,7 +36,7 @@ message TagResponse {
     string                      tag_description   = 3; 
     string                      tag_class         = 4; 
     string                      generated_by      = 5;
-    google.protobuf.Timestamp   created_at        = 6;
+    string                      created_at        = 6;
 }
 
 //Response to list tag 

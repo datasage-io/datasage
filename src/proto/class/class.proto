@@ -4,7 +4,6 @@ package class;
  
 option go_package = "github.com/datasage-io/datasage/proto/class";
  
-import "google/protobuf/timestamp.proto";
 
 //RPC Service 
 service Class {
@@ -37,7 +36,7 @@ message ClassResponse {
     string                      class_description   = 3; 
     string                      class_tag           = 4; 
     string                      generated_by        = 5;
-    google.protobuf.Timestamp   created_at          = 6;
+    string                      created_at          = 6;
 }
 
 //Response to list class 
