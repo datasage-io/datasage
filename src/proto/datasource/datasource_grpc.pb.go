@@ -22,9 +22,9 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DatasourceClient interface {
-	AddDatasource(ctx context.Context, in *AddRequest, opts ...grpc.CallOption) (Datasource_AddDatasourceClient, error)
-	ListDatasource(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (Datasource_ListDatasourceClient, error)
-	DeleteDatasource(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (Datasource_DeleteDatasourceClient, error)
+	AddDatasource(ctx context.Context, in *AddRequest, opts ...grpc.CallOption) (*MessageResponse, error)
+	ListDatasource(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListResponse, error)
+	DeleteDatasource(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*MessageResponse, error)
 }
 
 type datasourceClient struct {
@@ -35,109 +35,40 @@ func NewDatasourceClient(cc grpc.ClientConnInterface) DatasourceClient {
 	return &datasourceClient{cc}
 }
 
-func (c *datasourceClient) AddDatasource(ctx context.Context, in *AddRequest, opts ...grpc.CallOption) (Datasource_AddDatasourceClient, error) {
-	stream, err := c.cc.NewStream(ctx, &Datasource_ServiceDesc.Streams[0], "/datasource.Datasource/AddDatasource", opts...)
+func (c *datasourceClient) AddDatasource(ctx context.Context, in *AddRequest, opts ...grpc.CallOption) (*MessageResponse, error) {
+	out := new(MessageResponse)
+	err := c.cc.Invoke(ctx, "/datasource.Datasource/AddDatasource", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &datasourceAddDatasourceClient{stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
+	return out, nil
 }
 
-type Datasource_AddDatasourceClient interface {
-	Recv() (*MessageResponse, error)
-	grpc.ClientStream
-}
-
-type datasourceAddDatasourceClient struct {
-	grpc.ClientStream
-}
-
-func (x *datasourceAddDatasourceClient) Recv() (*MessageResponse, error) {
-	m := new(MessageResponse)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-func (c *datasourceClient) ListDatasource(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (Datasource_ListDatasourceClient, error) {
-	stream, err := c.cc.NewStream(ctx, &Datasource_ServiceDesc.Streams[1], "/datasource.Datasource/ListDatasource", opts...)
+func (c *datasourceClient) ListDatasource(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListResponse, error) {
+	out := new(ListResponse)
+	err := c.cc.Invoke(ctx, "/datasource.Datasource/ListDatasource", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &datasourceListDatasourceClient{stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
+	return out, nil
 }
 
-type Datasource_ListDatasourceClient interface {
-	Recv() (*ListResponse, error)
-	grpc.ClientStream
-}
-
-type datasourceListDatasourceClient struct {
-	grpc.ClientStream
-}
-
-func (x *datasourceListDatasourceClient) Recv() (*ListResponse, error) {
-	m := new(ListResponse)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-func (c *datasourceClient) DeleteDatasource(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (Datasource_DeleteDatasourceClient, error) {
-	stream, err := c.cc.NewStream(ctx, &Datasource_ServiceDesc.Streams[2], "/datasource.Datasource/DeleteDatasource", opts...)
+func (c *datasourceClient) DeleteDatasource(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*MessageResponse, error) {
+	out := new(MessageResponse)
+	err := c.cc.Invoke(ctx, "/datasource.Datasource/DeleteDatasource", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &datasourceDeleteDatasourceClient{stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
-}
-
-type Datasource_DeleteDatasourceClient interface {
-	Recv() (*MessageResponse, error)
-	grpc.ClientStream
-}
-
-type datasourceDeleteDatasourceClient struct {
-	grpc.ClientStream
-}
-
-func (x *datasourceDeleteDatasourceClient) Recv() (*MessageResponse, error) {
-	m := new(MessageResponse)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
+	return out, nil
 }
 
 // DatasourceServer is the server API for Datasource service.
 // All implementations must embed UnimplementedDatasourceServer
 // for forward compatibility
 type DatasourceServer interface {
-	AddDatasource(*AddRequest, Datasource_AddDatasourceServer) error
-	ListDatasource(*ListRequest, Datasource_ListDatasourceServer) error
-	DeleteDatasource(*DeleteRequest, Datasource_DeleteDatasourceServer) error
+	AddDatasource(context.Context, *AddRequest) (*MessageResponse, error)
+	ListDatasource(context.Context, *ListRequest) (*ListResponse, error)
+	DeleteDatasource(context.Context, *DeleteRequest) (*MessageResponse, error)
 	mustEmbedUnimplementedDatasourceServer()
 }
 
@@ -145,14 +76,14 @@ type DatasourceServer interface {
 type UnimplementedDatasourceServer struct {
 }
 
-func (UnimplementedDatasourceServer) AddDatasource(*AddRequest, Datasource_AddDatasourceServer) error {
-	return status.Errorf(codes.Unimplemented, "method AddDatasource not implemented")
+func (UnimplementedDatasourceServer) AddDatasource(context.Context, *AddRequest) (*MessageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddDatasource not implemented")
 }
-func (UnimplementedDatasourceServer) ListDatasource(*ListRequest, Datasource_ListDatasourceServer) error {
-	return status.Errorf(codes.Unimplemented, "method ListDatasource not implemented")
+func (UnimplementedDatasourceServer) ListDatasource(context.Context, *ListRequest) (*ListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListDatasource not implemented")
 }
-func (UnimplementedDatasourceServer) DeleteDatasource(*DeleteRequest, Datasource_DeleteDatasourceServer) error {
-	return status.Errorf(codes.Unimplemented, "method DeleteDatasource not implemented")
+func (UnimplementedDatasourceServer) DeleteDatasource(context.Context, *DeleteRequest) (*MessageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteDatasource not implemented")
 }
 func (UnimplementedDatasourceServer) mustEmbedUnimplementedDatasourceServer() {}
 
@@ -167,67 +98,58 @@ func RegisterDatasourceServer(s grpc.ServiceRegistrar, srv DatasourceServer) {
 	s.RegisterService(&Datasource_ServiceDesc, srv)
 }
 
-func _Datasource_AddDatasource_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(AddRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
+func _Datasource_AddDatasource_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddRequest)
+	if err := dec(in); err != nil {
+		return nil, err
 	}
-	return srv.(DatasourceServer).AddDatasource(m, &datasourceAddDatasourceServer{stream})
-}
-
-type Datasource_AddDatasourceServer interface {
-	Send(*MessageResponse) error
-	grpc.ServerStream
-}
-
-type datasourceAddDatasourceServer struct {
-	grpc.ServerStream
-}
-
-func (x *datasourceAddDatasourceServer) Send(m *MessageResponse) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func _Datasource_ListDatasource_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(ListRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
+	if interceptor == nil {
+		return srv.(DatasourceServer).AddDatasource(ctx, in)
 	}
-	return srv.(DatasourceServer).ListDatasource(m, &datasourceListDatasourceServer{stream})
-}
-
-type Datasource_ListDatasourceServer interface {
-	Send(*ListResponse) error
-	grpc.ServerStream
-}
-
-type datasourceListDatasourceServer struct {
-	grpc.ServerStream
-}
-
-func (x *datasourceListDatasourceServer) Send(m *ListResponse) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func _Datasource_DeleteDatasource_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(DeleteRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/datasource.Datasource/AddDatasource",
 	}
-	return srv.(DatasourceServer).DeleteDatasource(m, &datasourceDeleteDatasourceServer{stream})
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DatasourceServer).AddDatasource(ctx, req.(*AddRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
-type Datasource_DeleteDatasourceServer interface {
-	Send(*MessageResponse) error
-	grpc.ServerStream
+func _Datasource_ListDatasource_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DatasourceServer).ListDatasource(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/datasource.Datasource/ListDatasource",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DatasourceServer).ListDatasource(ctx, req.(*ListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
-type datasourceDeleteDatasourceServer struct {
-	grpc.ServerStream
-}
-
-func (x *datasourceDeleteDatasourceServer) Send(m *MessageResponse) error {
-	return x.ServerStream.SendMsg(m)
+func _Datasource_DeleteDatasource_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DatasourceServer).DeleteDatasource(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/datasource.Datasource/DeleteDatasource",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DatasourceServer).DeleteDatasource(ctx, req.(*DeleteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 // Datasource_ServiceDesc is the grpc.ServiceDesc for Datasource service.
@@ -236,23 +158,20 @@ func (x *datasourceDeleteDatasourceServer) Send(m *MessageResponse) error {
 var Datasource_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "datasource.Datasource",
 	HandlerType: (*DatasourceServer)(nil),
-	Methods:     []grpc.MethodDesc{},
-	Streams: []grpc.StreamDesc{
+	Methods: []grpc.MethodDesc{
 		{
-			StreamName:    "AddDatasource",
-			Handler:       _Datasource_AddDatasource_Handler,
-			ServerStreams: true,
+			MethodName: "AddDatasource",
+			Handler:    _Datasource_AddDatasource_Handler,
 		},
 		{
-			StreamName:    "ListDatasource",
-			Handler:       _Datasource_ListDatasource_Handler,
-			ServerStreams: true,
+			MethodName: "ListDatasource",
+			Handler:    _Datasource_ListDatasource_Handler,
 		},
 		{
-			StreamName:    "DeleteDatasource",
-			Handler:       _Datasource_DeleteDatasource_Handler,
-			ServerStreams: true,
+			MethodName: "DeleteDatasource",
+			Handler:    _Datasource_DeleteDatasource_Handler,
 		},
 	},
+	Streams:  []grpc.StreamDesc{},
 	Metadata: "datasource.proto",
 }

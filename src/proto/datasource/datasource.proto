@@ -7,9 +7,9 @@ option go_package = "github.com/datasage-io/datasage/proto/datasource";
 
 //RPC Service 
 service Datasource {
-   rpc AddDatasource ( addRequest ) returns ( stream messageResponse );
-   rpc ListDatasource ( listRequest ) returns ( stream listResponse );
-   rpc DeleteDatasource ( deleteRequest ) returns ( stream messageResponse );
+   rpc AddDatasource ( addRequest ) returns (  messageResponse );
+   rpc ListDatasource ( listRequest ) returns (  listResponse );
+   rpc DeleteDatasource ( deleteRequest ) returns (  messageResponse );
 }
 
 //Request for Create Datasource 

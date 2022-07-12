@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"sync"
 
@@ -28,17 +29,12 @@ type datasourceServer struct {
 	ds.DatasourceServer
 }
 
-func (d *datasourceServer) AddDatasource(in *ds.AddRequest, stream ds.Datasource_AddDatasourceServer) error {
-	fmt.Println("Add Datasource Request Data --- ", in)
-	if err := stream.Send(&ds.MessageResponse{Message: "Success"}); err != nil {
-		return err
-	}
-	return nil
+func (d *datasourceServer) AddDatasource(ctx context.Context, in *ds.AddRequest) (*ds.MessageResponse, error) {
+	fmt.Println("Add Datasource Request --- ", in)
+	return &ds.MessageResponse{Message: "Success"}, nil
 }
-
-func (d *datasourceServer) ListDatasource(in *ds.ListRequest, stream ds.Datasource_ListDatasourceServer) error {
-	fmt.Println("List Datasource Requested Data --- ", in)
-	//To Store Datasource
+func (d *datasourceServer) ListDatasource(ctx context.Context, in *ds.ListRequest) (*ds.ListResponse, error) {
+	fmt.Println("List Datasource Request --- ", in)
 	var datasource []*ds.ListAll
 	//Hardcoded Data
 	dbData := []*ds.ListAll{
@@ -57,18 +53,12 @@ func (d *datasourceServer) ListDatasource(in *ds.ListRequest, stream ds.Datasour
 	}
 	//Send Response to Client
 	datasource = append(datasource, dbData...)
-	if err := stream.Send(&ds.ListResponse{ListAllDatasources: datasource, Count: 10}); err != nil {
-		return err
-	}
-	return nil
-}
+	return &ds.ListResponse{ListAllDatasources: datasource, Count: 10}, nil
 
-func (d *datasourceServer) DeleteDatasource(in *ds.DeleteRequest, stream ds.Datasource_DeleteDatasourceServer) error {
-	fmt.Println("Delete Datasource Requested Data --- ", in)
-	if err := stream.Send(&ds.MessageResponse{Message: "Success"}); err != nil {
-		return err
-	}
-	return nil
+}
+func (d *datasourceServer) DeleteDatasource(ctx context.Context, in *ds.DeleteRequest) (*ds.MessageResponse, error) {
+	fmt.Println("Delete Datasource Request --- ", in)
+	return &ds.MessageResponse{Message: "Success"}, nil
 }
 
 // ======================= //
