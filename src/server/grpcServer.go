@@ -28,7 +28,7 @@ type datasourceServer struct {
 	ds.DatasourceServer
 }
 
-func (d *datasourceServer) AddDatasources(in *ds.AddDatasourceRequest, stream ds.Datasource_AddDatasourcesServer) error {
+func (d *datasourceServer) AddDatasource(in *ds.AddRequest, stream ds.Datasource_AddDatasourceServer) error {
 	fmt.Println("Add Datasource Request Data --- ", in)
 	if err := stream.Send(&ds.MessageResponse{Message: "Success"}); err != nil {
 		return err
@@ -36,34 +36,34 @@ func (d *datasourceServer) AddDatasources(in *ds.AddDatasourceRequest, stream ds
 	return nil
 }
 
-func (d *datasourceServer) ListDatasources(in *ds.ListDatasourceRequest, stream ds.Datasource_ListDatasourcesServer) error {
+func (d *datasourceServer) ListDatasource(in *ds.ListRequest, stream ds.Datasource_ListDatasourceServer) error {
 	fmt.Println("List Datasource Requested Data --- ", in)
 	//To Store Datasource
-	var datasource []*ds.ListAllDatasource
+	var datasource []*ds.ListAll
 	//Hardcoded Data
-	dbData := []*ds.ListAllDatasource{
-		{DsId: "1", DsDatadomain: "org1.com", DsName: "Google", DsDescription: "Google Data Domain", DsType: "MYSQL", DsVersion: "8", DsKey: "hjdhgdfgb3645634545", CreatedAt: "10-07-2022 12:15:34"},
-		{DsId: "2", DsDatadomain: "org2.com", DsName: "AWS", DsDescription: "Amazon Data Domain", DsType: "MYSQL", DsVersion: "8", DsKey: "hjdtyrydfgb3645634545", CreatedAt: "10-07-2022 12:15:34"},
-		{DsId: "3", DsDatadomain: "org3.com", DsName: "Google", DsDescription: "Google Data Domain", DsType: "MYSQL", DsVersion: "5", DsKey: "hjdhgdfgb3645634545", CreatedAt: "10-07-2022 12:15:34"},
-		{DsId: "4", DsDatadomain: "org4.com", DsName: "Google", DsDescription: "Google Data Domain", DsType: "MYSQL", DsVersion: "8", DsKey: "hjdhgdfgb3645634545", CreatedAt: "10-07-2022 12:15:34"},
-		{DsId: "5", DsDatadomain: "org5.com", DsName: "AWS", DsDescription: "Amazon Data Domain", DsType: "MYSQL", DsVersion: "8", DsKey: "hjfghfgdfgb3645634545", CreatedAt: "10-07-2022 12:15:34"},
-		{DsId: "6", DsDatadomain: "org6.com", DsName: "AWS", DsDescription: "Amazon Data Domain", DsType: "MYSQL", DsVersion: "8", DsKey: "hjdhgdfgb36456909gbjgh45", CreatedAt: "10-07-2022 12:15:34"},
-		{DsId: "7", DsDatadomain: "org7.com", DsName: "Google", DsDescription: "Google Data Domain", DsType: "MYSQL", DsVersion: "8", DsKey: "hjdhgdfgbhjghjghj4545", CreatedAt: "10-07-2022 12:15:34"},
-		{DsId: "8", DsDatadomain: "org8.com", DsName: "AWS", DsDescription: "Amazon Data Domain", DsType: "MYSQL", DsVersion: "5", DsKey: "ghjghjghjghjghj78678678", CreatedAt: "10-07-2022 12:15:34"},
-		{DsId: "9", DsDatadomain: "org9.com", DsName: "Google", DsDescription: "Google Data Domain", DsType: "MYSQL", DsVersion: "8", DsKey: "hjdhgdfgb3645634545", CreatedAt: "10-07-2022 12:15:34"},
-		{DsId: "10", DsDatadomain: "org10.com", DsName: "AWS", DsDescription: "Amazon Data Domain", DsType: "MYSQL", DsVersion: "8", DsKey: "ghjghjghjgh4456fghfgh", CreatedAt: "10-07-2022 12:15:34"},
-		{DsId: "11", DsDatadomain: "org11.com", DsName: "AWS", DsDescription: "Amazon Data Domain", DsType: "MYSQL", DsVersion: "8", DsKey: "fghfghfgh4556fghdfhh", CreatedAt: "10-07-2022 12:15:34"},
-		{DsId: "12", DsDatadomain: "org12.com", DsName: "Google", DsDescription: "Google Data Domain", DsType: "MYSQL", DsVersion: "8", DsKey: "fghfgy5668ghh5654", CreatedAt: "10-07-2022 12:15:34"},
+	dbData := []*ds.ListAll{
+		{Id: "1", Datadomain: "org1.com", Name: "Google", Description: "Google Data Domain", Type: "MYSQL", Version: "8", Key: "hjdhgdfgb3645634545", CreatedAt: "10-07-2022 12:15:34"},
+		{Id: "2", Datadomain: "org2.com", Name: "AWS", Description: "Amazon Data Domain", Type: "MYSQL", Version: "8", Key: "hjdtyrydfgb3645634545", CreatedAt: "10-07-2022 12:15:34"},
+		{Id: "3", Datadomain: "org3.com", Name: "Google", Description: "Google Data Domain", Type: "MYSQL", Version: "5", Key: "hjdhgdfgb3645634545", CreatedAt: "10-07-2022 12:15:34"},
+		{Id: "4", Datadomain: "org4.com", Name: "Google", Description: "Google Data Domain", Type: "MYSQL", Version: "8", Key: "hjdhgdfgb3645634545", CreatedAt: "10-07-2022 12:15:34"},
+		{Id: "5", Datadomain: "org5.com", Name: "AWS", Description: "Amazon Data Domain", Type: "MYSQL", Version: "8", Key: "hjfghfgdfgb3645634545", CreatedAt: "10-07-2022 12:15:34"},
+		{Id: "6", Datadomain: "org6.com", Name: "AWS", Description: "Amazon Data Domain", Type: "MYSQL", Version: "8", Key: "hjdhgdfgb36456909gbjgh45", CreatedAt: "10-07-2022 12:15:34"},
+		{Id: "7", Datadomain: "org7.com", Name: "Google", Description: "Google Data Domain", Type: "MYSQL", Version: "8", Key: "hjdhgdfgbhjghjghj4545", CreatedAt: "10-07-2022 12:15:34"},
+		{Id: "8", Datadomain: "org8.com", Name: "AWS", Description: "Amazon Data Domain", Type: "MYSQL", Version: "5", Key: "ghjghjghjghjghj78678678", CreatedAt: "10-07-2022 12:15:34"},
+		{Id: "9", Datadomain: "org9.com", Name: "Google", Description: "Google Data Domain", Type: "MYSQL", Version: "8", Key: "hjdhgdfgb3645634545", CreatedAt: "10-07-2022 12:15:34"},
+		{Id: "10", Datadomain: "org10.com", Name: "AWS", Description: "Amazon Data Domain", Type: "MYSQL", Version: "8", Key: "ghjghjghjgh4456fghfgh", CreatedAt: "10-07-2022 12:15:34"},
+		{Id: "11", Datadomain: "org11.com", Name: "AWS", Description: "Amazon Data Domain", Type: "MYSQL", Version: "8", Key: "fghfghfgh4556fghdfhh", CreatedAt: "10-07-2022 12:15:34"},
+		{Id: "12", Datadomain: "org12.com", Name: "Google", Description: "Google Data Domain", Type: "MYSQL", Version: "8", Key: "fghfgy5668ghh5654", CreatedAt: "10-07-2022 12:15:34"},
 	}
 	//Send Response to Client
 	datasource = append(datasource, dbData...)
-	if err := stream.Send(&ds.ListDatasourceResponse{ListAllDatasources: datasource}); err != nil {
+	if err := stream.Send(&ds.ListResponse{ListAllDatasources: datasource, Count: 10}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (d *datasourceServer) DeleteDatasources(in *ds.DeleteDatasourceRequest, stream ds.Datasource_DeleteDatasourcesServer) error {
+func (d *datasourceServer) DeleteDatasource(in *ds.DeleteRequest, stream ds.Datasource_DeleteDatasourceServer) error {
 	fmt.Println("Delete Datasource Requested Data --- ", in)
 	if err := stream.Send(&ds.MessageResponse{Message: "Success"}); err != nil {
 		return err
