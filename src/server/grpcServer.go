@@ -69,41 +69,27 @@ type tagServer struct {
 	tag.TagServer
 }
 
-func (t *tagServer) AddTag(in *tag.CreateTagRequest, stream tag.Tag_AddTagServer) error {
-	fmt.Println("Add Tag Request Data --- ", in)
-	if err := stream.Send(&tag.TagMessageResponse{Message: "Success"}); err != nil {
-		return err
-	}
-	return nil
+func (t *tagServer) AddTag(ctx context.Context, in *tag.AddRequest) (*tag.MessageResponse, error) {
+	fmt.Println("Delete Tag Request --- ", in)
+	return &tag.MessageResponse{Message: "Success"}, nil
 }
-
-func (t *tagServer) ListTag(in *tag.ListTagRequest, stream tag.Tag_ListTagServer) error {
-	fmt.Println("List Tag Requested Data --- ", in)
-	//To Store Tag
-	var tagdata []*tag.TagResponse
+func (t *tagServer) ListTag(ctx context.Context, in *tag.ListRequest) (*tag.ListResponse, error) {
+	fmt.Println("List Tag Request --- ", in)
 	//Hardcoded Data
 	dbData := []*tag.TagResponse{
-		{TagId: "1", TagName: "PII-3", TagDescription: "Personal Identofiable Information", TagClass: "Postal Address", CreatedAt: "10-07-2022 12:15:34"},
-		{TagId: "2", TagName: "PII", TagDescription: "Personal Identofiable Information", TagClass: "Bank Account", CreatedAt: "10-07-2022 12:15:34"},
-		{TagId: "3", TagName: "GDPR", TagDescription: "General Data Protection Regulation", TagClass: "Credit Card", CreatedAt: "10-07-2022 12:15:34"},
-		{TagId: "4", TagName: "HIPAA", TagDescription: "Portability Insurance And Accountablity Act Payment Card", TagClass: "Health Card", CreatedAt: "10-07-2022 12:15:34"},
-		{TagId: "5", TagName: "PCI-DSS", TagDescription: "Industry Data Security Standard", TagClass: "Bank Account", CreatedAt: "10-07-2022 12:15:34"},
-		{TagId: "6", TagName: "PHI", TagDescription: "Protected Health Information", TagClass: "Drug Enforcement Agency Registration Number", CreatedAt: "10-07-2022 12:15:34"},
+		{Id: "1", Name: "PII-3", Description: "Personal Identofiable Information", Class: []string{"Postal Address,Bank Account"}, CreatedAt: "10-07-2022 12:15:34"},
+		{Id: "2", Name: "PII", Description: "Personal Identofiable Information", Class: []string{"Bank Account"}, CreatedAt: "10-07-2022 12:15:34"},
+		{Id: "3", Name: "GDPR", Description: "General Data Protection Regulation", Class: []string{"Credit Card"}, CreatedAt: "10-07-2022 12:15:34"},
+		{Id: "4", Name: "HIPAA", Description: "Portability Insurance And Accountablity Act Payment Card", Class: []string{"Health Card"}, CreatedAt: "10-07-2022 12:15:34"},
+		{Id: "5", Name: "PCI-DSS", Description: "Industry Data Security Standard", Class: []string{"Bank Account"}, CreatedAt: "10-07-2022 12:15:34"},
+		{Id: "6", Name: "PHI", Description: "Protected Health Information", Class: []string{"Drug Enforcement Agency Registration Number"}, CreatedAt: "10-07-2022 12:15:34"},
 	}
 	//Send Response to Client
-	tagdata = append(tagdata, dbData...)
-	if err := stream.Send(&tag.ListTagResponse{TagResponse: tagdata}); err != nil {
-		return err
-	}
-	return nil
+	return &tag.ListResponse{TagResponse: dbData, Count: 6}, nil
 }
-
-func (t *tagServer) DeleteTag(in *tag.DeleteTagRequest, stream tag.Tag_DeleteTagServer) error {
-	fmt.Println("Delete Tag Requested Data --- ", in)
-	if err := stream.Send(&tag.TagMessageResponse{Message: "Success"}); err != nil {
-		return err
-	}
-	return nil
+func (t *tagServer) DeleteTag(ctx context.Context, in *tag.DeleteRequest) (*tag.MessageResponse, error) {
+	fmt.Println("Delete Tag Request --- ", in)
+	return &tag.MessageResponse{Message: "Success"}, nil
 }
 
 // ======================= //
@@ -114,41 +100,28 @@ type classServer struct {
 	class.ClassServer
 }
 
-func (c *classServer) AddClass(in *class.CreateClassRequest, stream class.Class_AddClassServer) error {
-	fmt.Println("Add Class Request Data --- ", in)
-	if err := stream.Send(&class.ClassMessageResponse{Message: "Success"}); err != nil {
-		return err
-	}
-	return nil
+func (c *classServer) AddClass(ctx context.Context, in *class.CreateRequest) (*class.MessageResponse, error) {
+	fmt.Println("Delete Class Request --- ", in)
+	return &class.MessageResponse{Message: "Success"}, nil
 }
-
-func (c *classServer) ListClass(in *class.ListClassRequest, stream class.Class_ListClassServer) error {
-	fmt.Println("List Class Requested Data --- ", in)
-	//To Store Class
-	var classdata []*class.ClassResponse
+func (c *classServer) ListClass(ctx context.Context, in *class.ListRequest) (*class.ListResponse, error) {
+	fmt.Println("List Class Request --- ", in)
 	//Hardcoded Data
 	dbData := []*class.ClassResponse{
-		{ClassId: "1", ClassName: "Indian Moblie Number", ClassDescription: "Indian Moblie Number", ClassTag: "PII-2", CreatedAt: "10-07-2022 12:15:34"},
-		{ClassId: "1", ClassName: "Passport Number", ClassDescription: "Contains Passport Number", ClassTag: "PII", CreatedAt: "10-07-2022 12:15:34"},
-		{ClassId: "1", ClassName: "Social Security Number", ClassDescription: "Contains Social Security Number", ClassTag: "PII", CreatedAt: "10-07-2022 12:15:34"},
-		{ClassId: "1", ClassName: "Drivers License Number", ClassDescription: "Contains Drivers License ID Number", ClassTag: "PII", CreatedAt: "10-07-2022 12:15:34"},
-		{ClassId: "1", ClassName: "Phone Number", ClassDescription: "Contains Phone Number", ClassTag: "PII", CreatedAt: "10-07-2022 12:15:34"},
-		{ClassId: "1", ClassName: "AWS secrets", ClassDescription: "Contains AWS Secrets", ClassTag: "GDPR", CreatedAt: "10-07-2022 12:15:34"},
+		{Id: "1", Name: "Indian Moblie Number", Description: "Indian Moblie Number", Tag: []string{"PII-2"}, CreatedAt: "10-07-2022 12:15:34"},
+		{Id: "2", Name: "Passport Number", Description: "Contains Passport Number", Tag: []string{"PII"}, CreatedAt: "10-07-2022 12:15:34"},
+		{Id: "3", Name: "Social Security Number", Description: "Contains Social Security Number", Tag: []string{"PII"}, CreatedAt: "10-07-2022 12:15:34"},
+		{Id: "4", Name: "Drivers License Number", Description: "Contains Drivers License ID Number", Tag: []string{"PII"}, CreatedAt: "10-07-2022 12:15:34"},
+		{Id: "5", Name: "Phone Number", Description: "Contains Phone Number", Tag: []string{"PII"}, CreatedAt: "10-07-2022 12:15:34"},
+		{Id: "6", Name: "AWS secrets", Description: "Contains AWS Secrets", Tag: []string{"GDPR"}, CreatedAt: "10-07-2022 12:15:34"},
 	}
 	//Send Response to Client
-	classdata = append(classdata, dbData...)
-	if err := stream.Send(&class.ListClassResponse{ClassResponse: classdata}); err != nil {
-		return err
-	}
-	return nil
-}
+	return &class.ListResponse{ClassResponse: dbData, Count: 6}, nil
 
-func (c *classServer) DeleteClass(in *class.DeleteClassRequest, stream class.Class_DeleteClassServer) error {
-	fmt.Println("Delete CLass Requested Data --- ", in)
-	if err := stream.Send(&class.ClassMessageResponse{Message: "Success"}); err != nil {
-		return err
-	}
-	return nil
+}
+func (c *classServer) DeleteClass(ctx context.Context, in *class.DeleteRequest) (*class.MessageResponse, error) {
+	fmt.Println("Delete Class Request --- ", in)
+	return &class.MessageResponse{Message: "Success"}, nil
 }
 
 // ================= //

@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.12.4
-// source: class/class.proto
+// source: class.proto
 
 package class
 
@@ -22,9 +22,9 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ClassClient interface {
-	AddClass(ctx context.Context, in *CreateClassRequest, opts ...grpc.CallOption) (Class_AddClassClient, error)
-	ListClass(ctx context.Context, in *ListClassRequest, opts ...grpc.CallOption) (Class_ListClassClient, error)
-	DeleteClass(ctx context.Context, in *DeleteClassRequest, opts ...grpc.CallOption) (Class_DeleteClassClient, error)
+	AddClass(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*MessageResponse, error)
+	ListClass(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListResponse, error)
+	DeleteClass(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*MessageResponse, error)
 }
 
 type classClient struct {
@@ -35,109 +35,40 @@ func NewClassClient(cc grpc.ClientConnInterface) ClassClient {
 	return &classClient{cc}
 }
 
-func (c *classClient) AddClass(ctx context.Context, in *CreateClassRequest, opts ...grpc.CallOption) (Class_AddClassClient, error) {
-	stream, err := c.cc.NewStream(ctx, &Class_ServiceDesc.Streams[0], "/class.Class/AddClass", opts...)
+func (c *classClient) AddClass(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*MessageResponse, error) {
+	out := new(MessageResponse)
+	err := c.cc.Invoke(ctx, "/class.Class/AddClass", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &classAddClassClient{stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
+	return out, nil
 }
 
-type Class_AddClassClient interface {
-	Recv() (*ClassMessageResponse, error)
-	grpc.ClientStream
-}
-
-type classAddClassClient struct {
-	grpc.ClientStream
-}
-
-func (x *classAddClassClient) Recv() (*ClassMessageResponse, error) {
-	m := new(ClassMessageResponse)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-func (c *classClient) ListClass(ctx context.Context, in *ListClassRequest, opts ...grpc.CallOption) (Class_ListClassClient, error) {
-	stream, err := c.cc.NewStream(ctx, &Class_ServiceDesc.Streams[1], "/class.Class/ListClass", opts...)
+func (c *classClient) ListClass(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListResponse, error) {
+	out := new(ListResponse)
+	err := c.cc.Invoke(ctx, "/class.Class/ListClass", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &classListClassClient{stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
+	return out, nil
 }
 
-type Class_ListClassClient interface {
-	Recv() (*ListClassResponse, error)
-	grpc.ClientStream
-}
-
-type classListClassClient struct {
-	grpc.ClientStream
-}
-
-func (x *classListClassClient) Recv() (*ListClassResponse, error) {
-	m := new(ListClassResponse)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-func (c *classClient) DeleteClass(ctx context.Context, in *DeleteClassRequest, opts ...grpc.CallOption) (Class_DeleteClassClient, error) {
-	stream, err := c.cc.NewStream(ctx, &Class_ServiceDesc.Streams[2], "/class.Class/DeleteClass", opts...)
+func (c *classClient) DeleteClass(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*MessageResponse, error) {
+	out := new(MessageResponse)
+	err := c.cc.Invoke(ctx, "/class.Class/DeleteClass", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &classDeleteClassClient{stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
-}
-
-type Class_DeleteClassClient interface {
-	Recv() (*ClassMessageResponse, error)
-	grpc.ClientStream
-}
-
-type classDeleteClassClient struct {
-	grpc.ClientStream
-}
-
-func (x *classDeleteClassClient) Recv() (*ClassMessageResponse, error) {
-	m := new(ClassMessageResponse)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
+	return out, nil
 }
 
 // ClassServer is the server API for Class service.
 // All implementations must embed UnimplementedClassServer
 // for forward compatibility
 type ClassServer interface {
-	AddClass(*CreateClassRequest, Class_AddClassServer) error
-	ListClass(*ListClassRequest, Class_ListClassServer) error
-	DeleteClass(*DeleteClassRequest, Class_DeleteClassServer) error
+	AddClass(context.Context, *CreateRequest) (*MessageResponse, error)
+	ListClass(context.Context, *ListRequest) (*ListResponse, error)
+	DeleteClass(context.Context, *DeleteRequest) (*MessageResponse, error)
 	mustEmbedUnimplementedClassServer()
 }
 
@@ -145,14 +76,14 @@ type ClassServer interface {
 type UnimplementedClassServer struct {
 }
 
-func (UnimplementedClassServer) AddClass(*CreateClassRequest, Class_AddClassServer) error {
-	return status.Errorf(codes.Unimplemented, "method AddClass not implemented")
+func (UnimplementedClassServer) AddClass(context.Context, *CreateRequest) (*MessageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddClass not implemented")
 }
-func (UnimplementedClassServer) ListClass(*ListClassRequest, Class_ListClassServer) error {
-	return status.Errorf(codes.Unimplemented, "method ListClass not implemented")
+func (UnimplementedClassServer) ListClass(context.Context, *ListRequest) (*ListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListClass not implemented")
 }
-func (UnimplementedClassServer) DeleteClass(*DeleteClassRequest, Class_DeleteClassServer) error {
-	return status.Errorf(codes.Unimplemented, "method DeleteClass not implemented")
+func (UnimplementedClassServer) DeleteClass(context.Context, *DeleteRequest) (*MessageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteClass not implemented")
 }
 func (UnimplementedClassServer) mustEmbedUnimplementedClassServer() {}
 
@@ -167,67 +98,58 @@ func RegisterClassServer(s grpc.ServiceRegistrar, srv ClassServer) {
 	s.RegisterService(&Class_ServiceDesc, srv)
 }
 
-func _Class_AddClass_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(CreateClassRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
+func _Class_AddClass_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
 	}
-	return srv.(ClassServer).AddClass(m, &classAddClassServer{stream})
-}
-
-type Class_AddClassServer interface {
-	Send(*ClassMessageResponse) error
-	grpc.ServerStream
-}
-
-type classAddClassServer struct {
-	grpc.ServerStream
-}
-
-func (x *classAddClassServer) Send(m *ClassMessageResponse) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func _Class_ListClass_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(ListClassRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
+	if interceptor == nil {
+		return srv.(ClassServer).AddClass(ctx, in)
 	}
-	return srv.(ClassServer).ListClass(m, &classListClassServer{stream})
-}
-
-type Class_ListClassServer interface {
-	Send(*ListClassResponse) error
-	grpc.ServerStream
-}
-
-type classListClassServer struct {
-	grpc.ServerStream
-}
-
-func (x *classListClassServer) Send(m *ListClassResponse) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func _Class_DeleteClass_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(DeleteClassRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/class.Class/AddClass",
 	}
-	return srv.(ClassServer).DeleteClass(m, &classDeleteClassServer{stream})
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClassServer).AddClass(ctx, req.(*CreateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
-type Class_DeleteClassServer interface {
-	Send(*ClassMessageResponse) error
-	grpc.ServerStream
+func _Class_ListClass_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClassServer).ListClass(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/class.Class/ListClass",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClassServer).ListClass(ctx, req.(*ListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
-type classDeleteClassServer struct {
-	grpc.ServerStream
-}
-
-func (x *classDeleteClassServer) Send(m *ClassMessageResponse) error {
-	return x.ServerStream.SendMsg(m)
+func _Class_DeleteClass_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClassServer).DeleteClass(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/class.Class/DeleteClass",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClassServer).DeleteClass(ctx, req.(*DeleteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 // Class_ServiceDesc is the grpc.ServiceDesc for Class service.
@@ -236,23 +158,20 @@ func (x *classDeleteClassServer) Send(m *ClassMessageResponse) error {
 var Class_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "class.Class",
 	HandlerType: (*ClassServer)(nil),
-	Methods:     []grpc.MethodDesc{},
-	Streams: []grpc.StreamDesc{
+	Methods: []grpc.MethodDesc{
 		{
-			StreamName:    "AddClass",
-			Handler:       _Class_AddClass_Handler,
-			ServerStreams: true,
+			MethodName: "AddClass",
+			Handler:    _Class_AddClass_Handler,
 		},
 		{
-			StreamName:    "ListClass",
-			Handler:       _Class_ListClass_Handler,
-			ServerStreams: true,
+			MethodName: "ListClass",
+			Handler:    _Class_ListClass_Handler,
 		},
 		{
-			StreamName:    "DeleteClass",
-			Handler:       _Class_DeleteClass_Handler,
-			ServerStreams: true,
+			MethodName: "DeleteClass",
+			Handler:    _Class_DeleteClass_Handler,
 		},
 	},
-	Metadata: "class/class.proto",
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "class.proto",
 }
