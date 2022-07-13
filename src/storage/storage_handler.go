@@ -45,6 +45,19 @@ CREATE TABLE IF NOT EXISTS "dp_databases" (
 	"Tags" TEXT NOT NULL,
 	"Classes" TEXT NOT NULL
   ) ;
+  CREATE TABLE IF NOT EXISTS  "DpDataSource" (
+	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
+	"Datadomain" TEXT NOT NULL,
+	"Dsname" TEXT NOT NULL,
+	"Dsdecription" TEXT NOT NULL,
+	"Dstype" TEXT NOT NULL,
+	"DsKey" TEXT NOT NULL,
+	"Dsversion" TEXT NOT NULL,
+	"Host" TEXT NOT NULL,
+	"Port" TEXT NOT NULL,
+	"User" TEXT NOT NULL,
+	"Password" TEXT NOT NULL
+  ) ;
 `
 
 type Class struct {
@@ -60,18 +73,19 @@ type Tag struct {
 	Rule        string `csv:"rule"`
 	Description string `csv:"description"`
 }
-
+type StorageConfig struct {
+	Type string
+	Path string
+}
 type Storage interface {
 	GetClasses() ([]Class, error)
 	GetTags() ([]Tag, error)
 	GetAssociatedTags(string) ([]Tag, error)
 	GetAssociatedClasses(string) ([]Class, error)
 	SetSchemaData(DpDbDatabase) error
-}
-
-type StorageConfig struct {
-	Type string
-	Path string
+	SetDpDataSourceData(DpDataSource) error
+	GetDpDataSources() ([]DpDataSource, error)
+	DeleteDpDataSources(id int64) (bool, error)
 }
 
 /*
@@ -107,6 +121,20 @@ type DpDbColumn struct {
 	DpDbTableID             int       `json:"dp_db_table_id"`
 }
 */
+type DpDataSource struct {
+	ID           int    `json:"id"`
+	Datadomain   string `json:"Datadomain"`
+	Dsname       string `json:"Dsname"`
+	Dsdecription string `json:"Dsdecription"`
+	Dstype       string `json:"Dstype"`
+	DsKey        string `json:"DsKey"`
+	Dsversion    string `json:"Dsversion"`
+	Host         string `json:"Host"`
+	Port         string `json:"Port"`
+	User         string `json:"User"`
+	Password     string `json:"Password"`
+	CreatedAt    string `json:"CreatedAt"`
+}
 
 type DpDbDatabase struct {
 	DbKey      string      `json:"DbKey"`
@@ -195,8 +223,9 @@ func New(config StorageConfig) (Storage, error) {
 
 	switch config.Type {
 	case "internal":
-
-		return NewInternalStorage(config.Path)
+		log.Println("New StorageConfig")
+		//return NewInternalStorage(config.Path)
+		return getInternalStorageInstance(config.Path)
 
 	default:
 		return nil, fmt.Errorf("%s storage not found", config.Type)

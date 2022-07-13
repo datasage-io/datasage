@@ -24,6 +24,7 @@ type DpDataSource struct {
 
 func Run(dpDataSource DpDataSource) {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	log.Println("Classification Handler Run")
 	//Fetch MetaData
 	/*
 		adpt, err := adaptors.New(adaptors.AdaptorConfig{
@@ -32,6 +33,7 @@ func Run(dpDataSource DpDataSource) {
 			Password: "Accu0104#",
 			Host:     "localhost"})
 	*/
+
 	adpt, err := adaptors.New(adaptors.AdaptorConfig{
 		Type:     dpDataSource.Dstype,
 		Username: dpDataSource.User,
@@ -44,7 +46,8 @@ func Run(dpDataSource DpDataSource) {
 	info, err := adpt.Scan()
 
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Println(err.Error())
+		return
 	}
 
 	if err != nil {
@@ -59,6 +62,7 @@ func Run(dpDataSource DpDataSource) {
 	classes, err := st.GetClasses()
 	if err != nil {
 		log.Println(err.Error())
+		return
 	}
 	log.Println("no of classes:= ", len(classes))
 
@@ -69,21 +73,63 @@ func Run(dpDataSource DpDataSource) {
 	}
 	log.Println("no of tags:= ", len(tags))
 
-	phonetag, err := st.GetAssociatedTags("Phone Number")
-	if err != nil {
-		log.Println(err.Error())
+	storageDpDataSourceObj := storage.DpDataSource{
+		ID:           -1,
+		Datadomain:   dpDataSource.Datadomain,
+		Dsname:       dpDataSource.Dsname,
+		Dsdecription: dpDataSource.Dsdecription,
+		Dstype:       dpDataSource.Dstype,
+		DsKey:        dpDataSource.DsKey,
+		Dsversion:    dpDataSource.Dsversion,
+		Host:         dpDataSource.Host,
+		Port:         dpDataSource.Port,
+		User:         dpDataSource.User,
+		Password:     dpDataSource.Password,
 	}
-	log.Println(phonetag)
+
+	err1 := st.SetDpDataSourceData(storageDpDataSourceObj)
+	if err1 != nil {
+		fmt.Println("SetDpDataSourceData error: ", err)
+		return
+	}
+
+	/*
+		phonetag, err := st.GetAssociatedTags("Phone Number")
+		if err != nil {
+			log.Println(err.Error())
+		}
+		log.Println(phonetag)
+	*/
+	log.Println(" identifying class and tags start")
+	columsCount := 0
+	tableCount := 0
+	dBCount := 0
+	skipDBs := []string{"mysql", "performance_schema", "datadefender"}
 
 	for _, sc := range info.Schemas {
-		//log.Println("DB name:= ", sc.Name)
+		dBCount = dBCount + 1
+		log.Println("DB name:= ", sc.Name)
+		skip := false
+		for _, skipDB := range skipDBs {
+
+			if skipDB == sc.Name {
+				log.Println("skip DB name:= ", sc.Name)
+				skip = true
+			}
+		}
+		if skip == true {
+			continue
+		}
+
 		dpDbTables := []storage.DpDbTable{}
 		for _, tb := range sc.Tables {
+			tableCount = tableCount + 1
 			//dpDbColumn := storage.DpDbColumn
 
 			dpDbColumns := []storage.DpDbColumn{}
 
 			for _, cols := range tb.Cols {
+				columsCount = columsCount + 1
 				colName, err1 := removeSpecialChars(cols.ColumnName)
 				if err1 != nil {
 					log.Println(err.Error())
@@ -108,10 +154,12 @@ func Run(dpDataSource DpDataSource) {
 						log.Println("TagName:", relatedtag.TagName)
 						tags = tags + ";" + relatedtag.TagName
 					}
-				} else {
-					continue
-
 				}
+				/*
+					else {
+						continue
+					}
+				*/
 
 				col := storage.DpDbColumn{
 					ColumnName:    colName,
@@ -131,7 +179,6 @@ func Run(dpDataSource DpDataSource) {
 			dpDbTables = append(dpDbTables, dpDbTable)
 
 		}
-
 		schema := storage.DpDbDatabase{
 			DbKey:      "todo",
 			Name:       sc.Name,
@@ -143,9 +190,39 @@ func Run(dpDataSource DpDataSource) {
 		if err != nil {
 			fmt.Println(err)
 		}
-
 	}
 
+	log.Println(" identifying class and tags completed")
+	log.Println(" columsCount", columsCount)
+
+}
+
+func ListDatasources() ([]storage.DpDataSource, error) {
+	log.Println("ListDatasources")
+	st, err := storage.New(storage.StorageConfig{Type: "internal", Path: "datasageD.db"})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	dataSources, err := st.GetDpDataSources()
+	log.Println(dataSources)
+	return dataSources, err
+
+}
+
+func DeleteDatasource(ids []int64) bool {
+	overallStatus := true
+	log.Println("DeleteDatasources ")
+	st, err := storage.New(storage.StorageConfig{Type: "internal", Path: "datasageD.db"})
+	if err == nil {
+		for i := range ids {
+			status, error := st.DeleteDpDataSources(ids[i])
+			if error != nil || status == false {
+				log.Println(error)
+				overallStatus = false
+			}
+		}
+	}
+	return overallStatus
 }
 
 //removeSpecialChars - Removes the special characters from the string.

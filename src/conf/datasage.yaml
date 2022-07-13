@@ -37,4 +37,6 @@ integrations:
   http:
     endpoint: https://accuknox.com/service/log
     method: post
+classifielers:
+  ignore_schema: mysql,performance_schema,datadefender
 
