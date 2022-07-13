@@ -4,60 +4,63 @@ package datasource;
  
 option go_package = "github.com/datasage-io/datasage/proto/datasource";
  
-import "google/protobuf/timestamp.proto";
 
 //RPC Service 
 service Datasource {
-   rpc AddDatasources ( addDatasourceRequest ) returns ( stream messageResponse );
-   rpc ListDatasources ( listDatasourceRequest ) returns ( stream listDatasourceResponse );
-   rpc DeleteDatasources ( deleteDatasourceRequest ) returns ( stream messageResponse );
+   rpc AddDatasource ( addRequest ) returns (  messageResponse );
+   rpc ListDatasource ( listRequest ) returns (  listResponse );
+   rpc DeleteDatasource ( deleteRequest ) returns (  messageResponse );
 }
 
 //Request for Create Datasource 
-message addDatasourceRequest {
-   string                      data_domain     = 1;  
-   string                      ds_name         = 2;
-   string                      ds_description  = 3;
-   string                      ds_type         = 4;
-   string                      ds_version      = 5;
-   string                      ds_key          = 6;       
-   string                      host            = 7;  
-   string                      port            = 8;
-   string                      user            = 9;
-   string                      password        = 10;
+message addRequest {
+   string     data_domain  = 1;  
+   string     name         = 2;
+   string     description  = 3;
+   string     type         = 4;
+   string     version      = 5;     
+   string     host         = 7;  
+   string     port         = 8;
+   string     user         = 9;
+   string     password     = 10;
 }
 
 //Request for List Datasource
-message listDatasourceRequest {
-   string host = 1;  
-   string port = 2;
-   string user = 3;
-   string password = 4;
+message listRequest {
+   string name                 = 1;
+   repeated string data_domain = 2;
+   repeated string type        = 3;
+   int64 first                 = 4;
+   int64 last                  = 5;
+   int64 limit                 = 6;
+   bool count                 = 7;
 }
 
 //Response for List Datasource
-message listDatasourceResponse {
-   repeated ListAllDatasource list_all_datasources = 1;
+message listResponse {
+   repeated ListAll list_all_datasources = 1;
+   int64 count = 2;
 }
 
 //Request for Delete Datasource
-message deleteDatasourceRequest {
-    int64 id = 1;
+message deleteRequest {
+   repeated string id = 1;
+   bool isDeleteAll   = 2;
 }
 
 //Response for  Datasource
 message messageResponse {
-    string message = 1;
+   string message = 1;
 }
 
-message ListAllDatasource {
-   string                      data_domain     = 1;  
-   string                      name            = 2;
-   string                      ds_description  = 3;
-   string                      ds_type         = 4;
-   string                      ds_version      = 5;
-   string                      ds_key          = 6;       
-   google.protobuf.Timestamp   created_at      = 7;
-   google.protobuf.Timestamp   deleted         = 8;
+message ListAll {
+   string    id           = 1;
+   string    datadomain   = 2;  
+   string    name         = 3;
+   string    description  = 4;
+   string    type         = 5;
+   string    version      = 6;
+   string    key          = 7;       
+   string    created_at   = 8;
 }
 

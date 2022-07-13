@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"os"
+	"sync"
 
 	_ "modernc.org/sqlite"
 )
@@ -23,25 +24,92 @@ func (into InternalStorage) InsertDefaultData(tags []*Tag, classes []*Class) err
 	INSERT INTO tag ("id","tag_name","rule","description")
 	 VALUES (?,?,?,?);
 	`)
-
+	defer tagInsert.Close()
 	for _, t := range tags {
 		_, err = tagInsert.Exec(t.Id, t.TagName, t.Rule, t.Description)
 	}
-	tagInsert.Close()
 
 	classInsert, err := into.SqliteConnc.Prepare(`
 	INSERT INTO class ("id","description","rule","class")
 	 VALUES (?,?,?,?);
 	`)
+	defer classInsert.Close()
 	for _, c := range classes {
 		_, err = classInsert.Exec(c.Id, c.Description, c.Rule, c.Class)
 	}
-	classInsert.Close()
+
 	return err
+}
+func (into InternalStorage) SetDpDataSourceData(dpDataSource DpDataSource) error {
+
+	dbInsert, errP := into.SqliteConnc.Prepare(`
+	INSERT INTO DpDataSource ("Datadomain","Dsname","Dsdecription","Dstype","DsKey","Dsversion","Host","Port","User","Password" )
+	VALUES (?,?,?,?,?,?,?,?,?,?);
+	`)
+	if errP != nil {
+		log.Println("Prepare statement error :", errP.Error())
+		return errP
+	}
+	defer dbInsert.Close()
+	_, errE := dbInsert.Exec(dpDataSource.Datadomain, dpDataSource.Dsname, dpDataSource.Dsdecription, dpDataSource.Dstype, dpDataSource.DsKey, dpDataSource.Dsversion, dpDataSource.Host, dpDataSource.Port, dpDataSource.User, dpDataSource.Password)
+	if errE != nil {
+		log.Println("Exec statement error", errE.Error())
+		return errE
+	}
+	return nil
+}
+
+func (into InternalStorage) GetDpDataSources() ([]DpDataSource, error) {
+	log.Println("InternalStorage GetDpDataSources")
+	dataSources := []DpDataSource{}
+
+	rows, err := into.SqliteConnc.Query("SELECT * FROM DpDataSource")
+	if err != nil {
+		return dataSources, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		tempDataSource := DpDataSource{}
+		err = rows.Scan(&tempDataSource.ID,
+			&tempDataSource.Datadomain,
+			&tempDataSource.Dsname,
+			&tempDataSource.Dsdecription,
+			&tempDataSource.Dstype,
+			&tempDataSource.DsKey,
+			&tempDataSource.Dsversion,
+			&tempDataSource.Host,
+			&tempDataSource.Port,
+			&tempDataSource.User,
+			&tempDataSource.Password)
+
+		dataSources = append(dataSources, tempDataSource)
+	}
+	return dataSources, err
+}
+
+func (into InternalStorage) DeleteDpDataSources(id int64) (bool, error) {
+	log.Println("InternalStorage DeleteDpDataSources", id)
+
+	res, err := into.SqliteConnc.Exec("DELETE FROM DpDataSource where ID=$1", id)
+	if err == nil {
+		count, err := res.RowsAffected()
+		log.Println("InternalStorage DeleteDpDataSources count is ", count)
+		if err == nil && count > 0 {
+
+			return true, nil
+		}
+
+	} else {
+		log.Println(err)
+	}
+	log.Println("InternalStorage DeleteDpDataSources count exit ")
+
+	return false, nil
 }
 
 func (into InternalStorage) SetSchemaData(dpDbDatabase DpDbDatabase) error {
 
+	log.Println("InternalStorage SetSchemaData", dpDbDatabase.Name)
 	dbInsert, err := into.SqliteConnc.Prepare(`
 	INSERT INTO dp_databases ("name","type")
 	VALUES (?,?);
@@ -67,14 +135,14 @@ func (into InternalStorage) SetSchemaData(dpDbDatabase DpDbDatabase) error {
 		`)
 		if err != nil {
 			log.Println("error3", err.Error())
-			continue
+			return err
 		}
 
 		//fmt.Println("INSERT INTO dp_db_tables :", table.Name, dpDbId)
 		dbDbTable, err := tableInsert.Exec(table.Name, dpDbId)
 		if err != nil {
 			log.Println("error3b", err.Error())
-			continue
+			return err
 		}
 
 		dbDbTableId, err := dbDbTable.LastInsertId()
@@ -102,10 +170,31 @@ func (into InternalStorage) SetSchemaData(dpDbDatabase DpDbDatabase) error {
 		columnInsert.Close()
 
 	}
+	log.Println("InternalStorage SetSchemaData done")
 	return err
 }
 
+/*
+var once sync.Once
+
+func CreateInternalStorage(dsn string) (InternalStorage, error) {
+	once.Do(func() { NewInternalStorage(dsn) })
+}
+*/
+
+var (
+	instance InternalStorage
+	once     sync.Once
+)
+
+func getInternalStorageInstance(dsn string) (InternalStorage, error) {
+	once.Do(func() {
+		instance, _ = NewInternalStorage(dsn)
+	})
+	return instance, nil
+}
 func NewInternalStorage(dsn string) (InternalStorage, error) {
+
 	log.Println("NewInternalStorage enter")
 	var isnew bool
 	_, err := os.Stat(dsn)
@@ -132,7 +221,8 @@ func NewInternalStorage(dsn string) (InternalStorage, error) {
 
 	}
 	log.Println("NewInternalStorage exit")
-	return insto, err
+
+	return insto, nil
 
 }
 
@@ -143,6 +233,7 @@ func (insto InternalStorage) GetTags() ([]Tag, error) {
 	if err != nil {
 		return tags, err
 	}
+	//defer rows.Close()
 	for rows.Next() {
 		tempTag := Tag{}
 		err = rows.Scan(&tempTag.Id, &tempTag.TagName,
@@ -150,6 +241,8 @@ func (insto InternalStorage) GetTags() ([]Tag, error) {
 
 		tags = append(tags, tempTag)
 	}
+	rows.Close()
+
 	return tags, err
 }
 
@@ -160,6 +253,7 @@ func (insto InternalStorage) GetClasses() ([]Class, error) {
 	if err != nil {
 		return classes, err
 	}
+	//defer rows.Close()
 	for rows.Next() {
 		tempClass := Class{}
 		err = rows.Scan(&tempClass.Id, &tempClass.Description,
@@ -167,7 +261,7 @@ func (insto InternalStorage) GetClasses() ([]Class, error) {
 
 		classes = append(classes, tempClass)
 	}
-
+	rows.Close()
 	return classes, err
 }
 
@@ -178,13 +272,14 @@ func (insto InternalStorage) GetAssociatedTags(class string) ([]Tag, error) {
 	if err != nil {
 		return tags, err
 	}
+
 	for rows.Next() {
 		tempTag := Tag{}
 		err = rows.Scan(&tempTag.Id, &tempTag.TagName,
 			&tempTag.Rule, &tempTag.Description)
 		tags = append(tags, tempTag)
 	}
-
+	rows.Close()
 	return tags, err
 }
 
@@ -195,12 +290,13 @@ func (insto InternalStorage) GetAssociatedClasses(rule string) ([]Class, error) 
 	if err != nil {
 		return classes, err
 	}
+
 	for rows.Next() {
 		tempClass := Class{}
 		err = rows.Scan(&tempClass.Id, &tempClass.Description,
 			&tempClass.Rule, &tempClass.Class)
 		classes = append(classes, tempClass)
 	}
-
+	rows.Close()
 	return classes, err
 }
