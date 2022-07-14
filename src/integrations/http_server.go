@@ -21,21 +21,19 @@ func loghandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "err : %v", err)
 	}
 	w.Header().Set("Content-Type", "application/json")
-	config, err := ReadLogConfig("src/conf/datasage.yaml")
-	if err != nil {
-		fmt.Fprintf(w, `{status: "not ok", "error": %v}`, err)
-		return
-	}
+	fmt.Fprintf(w, `{status : "ok"}`)
 	go func(http.ResponseWriter) {
 		config.StreamLogToAll(string(body))
 		if err != nil {
 			fmt.Fprintf(w, `{status: "not ok", "error": %v}`, err)
 			return
 		}
-		fmt.Fprintf(w, `{status : "ok"}`)
 	}(w)
 
 }
+
+var config, _ = ReadLogConfig("src/conf/datasage.yaml")
+
 func RunServer() {
 
 	http.HandleFunc("/log", loghandler)
