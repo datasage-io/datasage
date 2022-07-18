@@ -1,0 +1,66 @@
+syntax = "proto3";
+ 
+package datasource;
+ 
+option go_package = "github.com/datasage-io/datasage/proto/datasource";
+ 
+
+//RPC Service 
+service Datasource {
+   rpc AddDatasource ( addRequest ) returns (  messageResponse );
+   rpc ListDatasource ( listRequest ) returns (  listResponse );
+   rpc DeleteDatasource ( deleteRequest ) returns (  messageResponse );
+}
+
+//Request for Create Datasource 
+message addRequest {
+   string     data_domain  = 1;  
+   string     name         = 2;
+   string     description  = 3;
+   string     type         = 4;
+   string     version      = 5;     
+   string     host         = 7;  
+   string     port         = 8;
+   string     user         = 9;
+   string     password     = 10;
+}
+
+//Request for List Datasource
+message listRequest {
+   string name                 = 1;
+   repeated string data_domain = 2;
+   repeated string type        = 3;
+   int64 first                 = 4;
+   int64 last                  = 5;
+   int64 limit                 = 6;
+   bool count                 = 7;
+}
+
+//Response for List Datasource
+message listResponse {
+   repeated ListAll list_all_datasources = 1;
+   int64 count = 2;
+}
+
+//Request for Delete Datasource
+message deleteRequest {
+   repeated string id = 1;
+   bool isDeleteAll   = 2;
+}
+
+//Response for  Datasource
+message messageResponse {
+   string message = 1;
+}
+
+message ListAll {
+   string    id           = 1;
+   string    datadomain   = 2;  
+   string    name         = 3;
+   string    description  = 4;
+   string    type         = 5;
+   string    version      = 6;
+   string    key          = 7;       
+   string    created_at   = 8;
+}
+

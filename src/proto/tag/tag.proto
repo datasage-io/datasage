@@ -1,0 +1,57 @@
+syntax = "proto3";
+ 
+package tag;
+ 
+option go_package = "github.com/datasage-io/datasage/proto/tag";
+ 
+
+//RPC Service 
+service Tag {
+   rpc AddTag ( addRequest ) returns (  messageResponse );
+   rpc ListTag( listRequest ) returns ( listResponse );
+   rpc DeleteTag ( deleteRequest ) returns ( messageResponse );
+}
+
+//Request for Add Tag 
+message addRequest {
+    string name           = 1;  
+    string description    = 2;
+    repeated string class = 3;
+}
+
+//Response for  Tag
+message messageResponse {
+    string message = 1;
+}
+
+//List Tag Request
+message listRequest {
+    repeated string id    = 1; 
+    string name           = 2;
+    repeated string class = 3;
+    int64 first           = 4;
+    int64 last            = 5;
+    int64 limit           = 6;
+    bool count            = 7;
+}
+
+//Tag Response Structure
+message TagResponse {
+    string   id             = 1;
+    string   name           = 2;
+    string   description    = 3; 
+    repeated string   class = 4; 
+    string   created_at     = 6;
+}
+
+//Response to list tag 
+message listResponse {
+    repeated TagResponse tagResponse = 1;
+    int64    count                   = 2;
+}
+
+//Request for Delete tag
+message deleteRequest {
+   repeated string id = 1;
+   bool isDeleteAll   = 2;
+}

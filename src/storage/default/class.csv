@@ -1,0 +1,39 @@
+id,description,rule,class
+1,Contains Phone Number,Phone Number,Phone Number
+2,Contains Drivers License ID Number,Drivers License ID Number,Drivers License ID Number
+3,Contains Social Security Number,Social Security Number,Social Security Number
+4,Contains Passport Number,Passport Number,Passport Number
+5,Contains Taxpayer Number,Taxpayer Number,Taxpayer Number
+6,Contains National Insurance Number,National Insurance Number,National Insurance Number
+7,Contains Electoral Roll Number,Electoral Roll Number,Electoral Roll Number
+8,Contains Medical Beneficiary Number,Medical Beneficiary Number,Medical Beneficiary Number
+9,Contains Healthcare Common Procedure Coding System,Healthcare Common Procedure Coding System,Healthcare Common Procedure Coding System
+10,Contains Unique Device Identifier,Unique Device Identifier,Unique Device Identifier
+11,Contains Health Insurance Claim Number,Health Insurance Claim Number,Health Insurance Claim Number
+12,Contains National Drug Code,National Drug Code,National Drug Code
+13,Contains National Provider Identifier,National Provider Identifier,National Provider Identifier
+14,Contains Drug Enforcement Agency Registration Number,Drug Enforcement Agency Registration Number,Drug Enforcement Agency Registration Number
+15,Contains National Health Service Number,National Health Service Number,National Health Service Number
+16,Contains Credit Card Number,Credit Card Number,Credit Card Number
+17,Contains Bank Account Numbers,Bank Account Numbers,Bank Account Numbers
+18,Contains Email Address,Email Address,Email Address
+19,Contains VIN Number,VIN Number,VIN Number
+20,Contains Local MAC Address,Local MAC Address,Local MAC Address
+21,Contains Universal MAC Address,Universal MAC Address,Universal MAC Address
+22,Contains DNS Name,DNS Name,DNS Name
+23,Contains URL,URL,URL
+24,Contains IPv4 Address,IPv4 Address,IPv4 Address
+25,Contains IPv6 Address,IPv6 Address,IPv6 Address
+26,Contains X.509 Digital Certificates,X.509 Digital Certificates,X.509 Digital Certificates
+27,Contains PGP Keys,PGP Keys,PGP Keys
+28,Contains JDBC Connection Strings,JDBC Connection Strings,JDBC Connection Strings
+29,Contains ODBC Connection Strings,ODBC Connection Strings,ODBC Connection Strings
+30,Contains AWS Secrets,AWS Secrets,AWS Secrets
+31,Contains OpenSSH Keys,OpenSSH Keys,OpenSSH Keys
+32,Contains pem Keys,pem Keys,pem Keys
+33,Contains ppk Keys,ppk Keys,ppk Keys
+34,Contains XML Keys,XML Keys,XML Keys
+35,Contains Facebook Access Token,Facebook Access Token,Facebook Access Token
+36,Contains Generic Secret Key,Generic Secret Key,Generic Secret Key
+37,Contains Github Access Key,Github Access Key,Github Access Key
+38,Contains Google API key,Google API key,Google API key
