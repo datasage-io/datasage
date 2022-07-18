@@ -21,25 +21,26 @@ func (into InternalStorage) InsertDefaultData(tags []*Tag, classes []*Class) err
 	}
 
 	tagInsert, err := into.SqliteConnc.Prepare(`
-	INSERT INTO tag ("id","tag_name","rule","description")
-	 VALUES (?,?,?,?);
+	INSERT INTO tag ("tag_name","rule","description")
+	 VALUES (?,?,?);
 	`)
 	defer tagInsert.Close()
 	for _, t := range tags {
-		_, err = tagInsert.Exec(t.Id, t.TagName, t.Rule, t.Description)
+		_, err = tagInsert.Exec(t.TagName, t.Rule, t.Description)
 	}
 
 	classInsert, err := into.SqliteConnc.Prepare(`
-	INSERT INTO class ("id","description","rule","class")
-	 VALUES (?,?,?,?);
+	INSERT INTO class ("description","rule","class")
+	 VALUES (?,?,?);
 	`)
 	defer classInsert.Close()
 	for _, c := range classes {
-		_, err = classInsert.Exec(c.Id, c.Description, c.Rule, c.Class)
+		_, err = classInsert.Exec(c.Description, c.Rule, c.Class)
 	}
 
 	return err
 }
+
 func (into InternalStorage) SetDpDataSourceData(dpDataSource DpDataSource) error {
 
 	dbInsert, errP := into.SqliteConnc.Prepare(`
@@ -224,6 +225,32 @@ func NewInternalStorage(dsn string) (InternalStorage, error) {
 
 	return insto, nil
 
+}
+
+func (insto InternalStorage) AddTag(name string, description string, rules []string) error {
+	log.Println("AddTag ")
+	tagInsert, err := insto.SqliteConnc.Prepare(`
+	INSERT INTO tag ("tag_name","description","rule")
+	 VALUES (?,?,?);
+	`)
+	if err != nil {
+		return err
+	}
+	//defer tagInsert.Close()
+	for _, rule := range rules {
+		log.Println("AddTag rule: %v ", rule)
+		_, err = tagInsert.Exec(name, description, rule)
+		if err != nil {
+			return err
+		}
+	}
+	tagInsert.Close()
+	log.Println("AddTag done")
+	return nil
+}
+
+func (insto InternalStorage) DeleteTag(id int64) error {
+	return nil
 }
 
 func (insto InternalStorage) GetTags() ([]Tag, error) {

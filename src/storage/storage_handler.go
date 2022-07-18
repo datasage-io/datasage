@@ -12,18 +12,16 @@ import (
 var initSchema = `
 
 CREATE TABLE IF NOT EXISTS "class" (
-	"id"	INTEGER,
+	"id"	INTEGER PRIMARY KEY AUTOINCREMENT,
 	"description"	TEXT,
 	"rule"	TEXT,
-	"class"	TEXT,
-	PRIMARY KEY("id")
+	"class"	TEXT
 );
 CREATE TABLE IF NOT EXISTS "tag" (
-	"id"	INTEGER,
+	"id"	INTEGER PRIMARY KEY AUTOINCREMENT,
 	"tag_name"	TEXT,
 	"rule"	TEXT,
-	"description"	TEXT,
-	PRIMARY KEY("id")
+	"description"	TEXT
 );
 CREATE TABLE IF NOT EXISTS "dp_databases" (
 	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -80,6 +78,8 @@ type StorageConfig struct {
 type Storage interface {
 	GetClasses() ([]Class, error)
 	GetTags() ([]Tag, error)
+	AddTag(string, string, []string) error
+
 	GetAssociatedTags(string) ([]Tag, error)
 	GetAssociatedClasses(string) ([]Class, error)
 	SetSchemaData(DpDbDatabase) error
@@ -218,6 +218,10 @@ func GetAllDefaultClassAndTags() ([]*Tag, []*Class, error) {
 
 	}
 	return tags, classes, nil
+}
+func GetStorageInstance() (Storage, error) {
+	return New(StorageConfig{Type: "internal", Path: "datasageD.db"})
+
 }
 func New(config StorageConfig) (Storage, error) {
 

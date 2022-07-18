@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"regexp"
+	"strings"
 
 	"github.com/datasage-io/datasage/src/adaptors"
 	"github.com/datasage-io/datasage/src/storage"
@@ -26,14 +27,6 @@ func Run(dpDataSource DpDataSource) {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	log.Println("Classification Handler Run")
 	//Fetch MetaData
-	/*
-		adpt, err := adaptors.New(adaptors.AdaptorConfig{
-			Type:     "mysql",
-			Username: "user1",
-			Password: "Accu0104#",
-			Host:     "localhost"})
-	*/
-
 	adpt, err := adaptors.New(adaptors.AdaptorConfig{
 		Type:     dpDataSource.Dstype,
 		Username: dpDataSource.User,
@@ -141,32 +134,28 @@ func Run(dpDataSource DpDataSource) {
 				//if err != nil {
 				//	log.Println(err.Error())
 				//}
-				tags := ""
-				classes := ""
+				tags := []string{}
+				classes := []string{}
 				if len(relatedclasses) > 0 {
 					for _, relatedclass := range relatedclasses {
 						log.Println("Class:= ", relatedclass.Class)
-						classes = classes + ";" + relatedclass.Class
+						//classes = classes + ";" + relatedclass.
+						classes = append(classes, relatedclass.Class)
 					}
 				}
 				if len(relatedtags) > 0 {
 					for _, relatedtag := range relatedtags {
 						log.Println("TagName:", relatedtag.TagName)
-						tags = tags + ";" + relatedtag.TagName
+						//tags = tags + ";" + relatedtag.TagName
+						tags = append(tags, relatedtag.TagName)
 					}
 				}
-				/*
-					else {
-						continue
-					}
-				*/
-
 				col := storage.DpDbColumn{
 					ColumnName:    colName,
 					ColumnType:    cols.ColumnType,
 					ColumnComment: cols.ColumnComment,
-					Tags:          tags,
-					Classes:       classes,
+					Tags:          strings.Join(tags, ";"),
+					Classes:       strings.Join(classes, ";"),
 				}
 				dpDbColumns = append(dpDbColumns, col)
 			}

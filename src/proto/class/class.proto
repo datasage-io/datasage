@@ -1,0 +1,57 @@
+syntax = "proto3";
+ 
+package class;
+ 
+option go_package = "github.com/datasage-io/datasage/proto/class";
+ 
+
+//RPC Service 
+service Class {
+   rpc AddClass ( createRequest ) returns ( messageResponse );
+   rpc ListClass( listRequest ) returns ( listResponse );
+   rpc DeleteClass ( deleteRequest ) returns ( messageResponse );
+}
+
+//Request for Create Class 
+message createRequest {
+    string name         = 1;  
+    string description  = 2;
+    repeated string tag = 3;
+}
+
+//Response for  Class
+message messageResponse {
+    string message = 1;
+}
+
+//List Class Request
+message listRequest {
+    repeated string id    = 1; 
+    string name           = 2;
+    repeated string tag   = 3;
+    int64 first           = 4;
+    int64 last            = 5;
+    int64 limit           = 6;
+    bool count            = 7;
+}
+
+//Class Response Structure
+message ClassResponse {
+    string    id            = 1;
+    string    name          = 2;
+    string    description   = 3; 
+    string    tag           = 4; 
+    string    created_at    = 6;
+}
+
+//Response to list class 
+message listResponse {
+    repeated ClassResponse classResponse = 1;
+    int64 count = 2;
+}
+
+//Request for Delete class
+message deleteRequest {
+   repeated string id = 1;
+   bool isDeleteAll   = 2;
+}
