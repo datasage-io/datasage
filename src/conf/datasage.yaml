@@ -38,6 +38,7 @@ integrations:
     - endpoint: https://accuknox.com/service/log
       method: post
 classifiers:
+  dbschema-scan-interval: 10
   ignore_schema: mysql,performance_schema,datadefender
 
 
