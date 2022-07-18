@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"net"
 	"strconv"
 	"sync"
 
@@ -201,9 +202,13 @@ func (d *DatasourceServer) DeleteDatasource(ctx context.Context, in *ds.DeleteRe
 // == gRPC Server == //
 // ================= //
 
-//GetNewServer - gRPC Server
-func GetNewServer() *grpc.Server {
-	log.Info().Msg("gRPC Server Started....")
+func RunServer() {
+
+	listen, err := net.Listen("tcp", ":"+PortNumber)
+	if err != nil {
+		log.Error().Msgf("gRPC server failed to listen : %v", err)
+	}
+
 	s := grpc.NewServer()
 	grpc_health_v1.RegisterHealthServer(s, health.NewServer())
 
@@ -213,5 +218,9 @@ func GetNewServer() *grpc.Server {
 	tagpb.RegisterTagServer(s, &TagServer{})
 	classpb.RegisterClassServer(s, &ClassServer{})
 
-	return s
+	//Start service
+	log.Info().Msgf("gRPC server on %s port started", PortNumber)
+	if err := s.Serve(listen); err != nil {
+		log.Error().Msgf("Failed to serve: %v", err)
+	}
 }
