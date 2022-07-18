@@ -26,7 +26,8 @@ CREATE TABLE IF NOT EXISTS "tag" (
 CREATE TABLE IF NOT EXISTS "dp_databases" (
 	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
 	"name" TEXT,
-	"type" TEXT
+	"type" TEXT,
+	"dskey" TEXT NOT NULL
   );
   CREATE TABLE IF NOT EXISTS  "dp_db_tables" (
 	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -83,44 +84,12 @@ type Storage interface {
 	GetAssociatedTags(string) ([]Tag, error)
 	GetAssociatedClasses(string) ([]Class, error)
 	SetSchemaData(DpDbDatabase) error
-	SetDpDataSourceData(DpDataSource) error
-	GetDpDataSources() ([]DpDataSource, error)
-	DeleteDpDataSources(id int64) (bool, error)
+
+	AddDataSource(DpDataSource) error
+	GetDataSources() ([]DpDataSource, error)
+	DeleteDataSources(ids []int64) (bool, error)
 }
 
-/*
-type DatabaseScanDto struct {
-	ID                      int         `json:"id"`
-	DbKey                   string      `json:"db_key"`
-	Name                    string      `json:"name"`
-	Type                    string      `json:"type"`
-	ModifiedDeletedAtSource int         `json:"modified_deleted_at_source"`
-	Deleted                 time.Time   `json:"deleted"`
-	Key                     string      `json:"key"`
-	LastScanID              int         `json:"last_scan_id"`
-	DpDbTable               []DpDbTable `json:"dp_db_table"`
-}
-
-type DpDbTable struct {
-	ID                      int          `json:"id"`
-	Name                    string       `json:"name"`
-	Tags                    string       `json:"tags"`
-	ModifiedDeletedAtSource int          `json:"modified_deleted_at_source"`
-	DeletedAt               time.Time    `json:"deleted_at"`
-	DpDbID                  int          `json:"dp_db_id"`
-	DpDbColumn              []DpDbColumn `json:"dp_db_column"`
-}
-
-type DpDbColumn struct {
-	ID                      int       `json:"id"`
-	ColumnName              string    `json:"column_name"`
-	ColumnType              string    `json:"column_type"`
-	ColumnComment           string    `json:"column_comment"`
-	ModifiedDeletedAtSource int       `json:"modified_deleted_at_source"`
-	DeletedAt               time.Time `json:"deleted_at"`
-	DpDbTableID             int       `json:"dp_db_table_id"`
-}
-*/
 type DpDataSource struct {
 	ID           int    `json:"id"`
 	Datadomain   string `json:"Datadomain"`
@@ -137,10 +106,9 @@ type DpDataSource struct {
 }
 
 type DpDbDatabase struct {
-	DbKey      string      `json:"DbKey"`
+	DsKey      string      `json:"DbKey"`
 	Name       string      `json:"Name"`
 	Type       string      `json:"Type"`
-	Key        string      `json:"Key"`
 	DpDbTables []DpDbTable `json:"DpDbTable"`
 }
 
@@ -188,11 +156,6 @@ type ScanDto struct {
 	DatabaseId int `json:"db_id"`
 }
 
-/*TODO: code to read .csv files form repository goes
-here.
-for now reading .csv files from local filesystem use
-use go embed in final development
-*/
 func GetAllDefaultClassAndTags() ([]*Tag, []*Class, error) {
 	tagr, err := os.Open("./storage/default/tags.csv")
 	if err != nil {
@@ -223,11 +186,11 @@ func GetStorageInstance() (Storage, error) {
 	return New(StorageConfig{Type: "internal", Path: "datasageD.db"})
 
 }
+
 func New(config StorageConfig) (Storage, error) {
 
 	switch config.Type {
 	case "internal":
-		log.Println("New StorageConfig")
 		//return NewInternalStorage(config.Path)
 		return getInternalStorageInstance(config.Path)
 

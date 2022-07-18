@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"sync"
 
-	dpclassifcation "github.com/datasage-io/datasage/src/classifiers"
 	logger "github.com/datasage-io/datasage/src/logger"
 
 	classpb "github.com/datasage-io/datasage/src/proto/class"
@@ -139,7 +138,13 @@ func (d *TagServer) DeleteTag(ctx context.Context, in *tagpb.DeleteRequest) (*ta
 
 func (d *DatasourceServer) AddDatasource(ctx context.Context, in *ds.AddRequest) (*ds.MessageResponse, error) {
 	fmt.Println("Add Datasource Request --- ", in)
-	dpDataSource := dpclassifcation.DpDataSource{
+	st, err := storage.GetStorageInstance()
+	if err != nil {
+		log.Error().Err(err).Msg("Internal Error")
+	}
+
+	storageDpDataSourceObj := storage.DpDataSource{
+		ID:           -1,
 		Datadomain:   in.GetDataDomain(),
 		Dsname:       in.GetName(),
 		Dsdecription: in.GetDescription(),
@@ -151,13 +156,21 @@ func (d *DatasourceServer) AddDatasource(ctx context.Context, in *ds.AddRequest)
 		Password:     in.GetPassword(),
 		DsKey:        uuid.New().String(),
 	}
-	go dpclassifcation.Run(dpDataSource)
-	fmt.Println("Add Datasource Request Data sending response ", in)
-	return &ds.MessageResponse{Message: "Success"}, nil
+
+	err1 := st.AddDataSource(storageDpDataSourceObj)
+	if err1 != nil {
+		return &ds.MessageResponse{Message: "Error"}, nil
+	}
+	return &ds.MessageResponse{Message: "Sucess"}, nil
 }
 func (d *DatasourceServer) ListDatasource(ctx context.Context, in *ds.ListRequest) (*ds.ListResponse, error) {
 	fmt.Println("List Datasource Request ", in)
-	datasources, err := dpclassifcation.ListDatasources()
+	st, err := storage.GetStorageInstance()
+	if err != nil {
+		log.Error().Err(err).Msg("Internal Error")
+	}
+
+	datasources, err := st.GetDataSources()
 	if err != nil {
 		fmt.Println("ListDatasources error  ")
 	}
@@ -181,6 +194,11 @@ func (d *DatasourceServer) ListDatasource(ctx context.Context, in *ds.ListReques
 }
 func (d *DatasourceServer) DeleteDatasource(ctx context.Context, in *ds.DeleteRequest) (*ds.MessageResponse, error) {
 	fmt.Println("Delete Datasource Request --- ", in)
+	st, err := storage.GetStorageInstance()
+	if err != nil {
+		log.Error().Err(err).Msg("Internal Error")
+	}
+
 	var ids []int64
 	arrayIds := in.GetId()
 	for i := range arrayIds {
@@ -191,7 +209,11 @@ func (d *DatasourceServer) DeleteDatasource(ctx context.Context, in *ds.DeleteRe
 		}
 		ids = append(ids, id)
 	}
-	statusDelete := dpclassifcation.DeleteDatasource(ids)
+
+	statusDelete, err := st.DeleteDataSources(ids)
+	if err != nil {
+		log.Error().Err(err).Msg("Internal Error")
+	}
 	if statusDelete == true {
 		return &ds.MessageResponse{Message: "Delete sucessful"}, nil
 	}

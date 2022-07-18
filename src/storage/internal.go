@@ -41,7 +41,7 @@ func (into InternalStorage) InsertDefaultData(tags []*Tag, classes []*Class) err
 	return err
 }
 
-func (into InternalStorage) SetDpDataSourceData(dpDataSource DpDataSource) error {
+func (into InternalStorage) AddDataSource(dpDataSource DpDataSource) error {
 
 	dbInsert, errP := into.SqliteConnc.Prepare(`
 	INSERT INTO DpDataSource ("Datadomain","Dsname","Dsdecription","Dstype","DsKey","Dsversion","Host","Port","User","Password" )
@@ -60,7 +60,7 @@ func (into InternalStorage) SetDpDataSourceData(dpDataSource DpDataSource) error
 	return nil
 }
 
-func (into InternalStorage) GetDpDataSources() ([]DpDataSource, error) {
+func (into InternalStorage) GetDataSources() ([]DpDataSource, error) {
 	log.Println("InternalStorage GetDpDataSources")
 	dataSources := []DpDataSource{}
 
@@ -88,20 +88,21 @@ func (into InternalStorage) GetDpDataSources() ([]DpDataSource, error) {
 	return dataSources, err
 }
 
-func (into InternalStorage) DeleteDpDataSources(id int64) (bool, error) {
-	log.Println("InternalStorage DeleteDpDataSources", id)
+func (into InternalStorage) DeleteDataSources(ids []int64) (bool, error) {
+	log.Println("InternalStorage DeleteDpDataSources", ids)
+	for _, dsid := range ids {
+		res, err := into.SqliteConnc.Exec("DELETE FROM DpDataSource where ID=$1", dsid)
+		if err == nil {
+			count, err := res.RowsAffected()
+			log.Println("InternalStorage DeleteDpDataSources count is ", count)
+			if err == nil && count > 0 {
 
-	res, err := into.SqliteConnc.Exec("DELETE FROM DpDataSource where ID=$1", id)
-	if err == nil {
-		count, err := res.RowsAffected()
-		log.Println("InternalStorage DeleteDpDataSources count is ", count)
-		if err == nil && count > 0 {
+				return true, nil
+			}
 
-			return true, nil
+		} else {
+			log.Println(err)
 		}
-
-	} else {
-		log.Println(err)
 	}
 	log.Println("InternalStorage DeleteDpDataSources count exit ")
 
@@ -111,15 +112,16 @@ func (into InternalStorage) DeleteDpDataSources(id int64) (bool, error) {
 func (into InternalStorage) SetSchemaData(dpDbDatabase DpDbDatabase) error {
 
 	log.Println("InternalStorage SetSchemaData", dpDbDatabase.Name)
+
 	dbInsert, err := into.SqliteConnc.Prepare(`
-	INSERT INTO dp_databases ("name","type")
-	VALUES (?,?);
+	INSERT INTO dp_databases ("name","type","dskey")
+	VALUES (?,?,?);
 	`)
 	if err != nil {
 		log.Println("error1", err.Error())
 		return err
 	}
-	dpDb, err := dbInsert.Exec(dpDbDatabase.Name, dpDbDatabase.Type)
+	dpDb, err := dbInsert.Exec(dpDbDatabase.Name, dpDbDatabase.Type, dpDbDatabase.DsKey)
 	if err != nil {
 		log.Println("error2", err.Error())
 		return err
@@ -219,7 +221,6 @@ func NewInternalStorage(dsn string) (InternalStorage, error) {
 			return InternalStorage{}, err
 		}
 		err = insto.InsertDefaultData(tags, classes)
-
 	}
 	log.Println("NewInternalStorage exit")
 
