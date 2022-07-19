@@ -1,4 +1,5 @@
 # Introduction to DataSage
+![DataSage Logo](./assets/logo-datasage.png)
 
 DataSage.io is a cloud data classification and tracking product that allows enterprises to implement governance, risk, and compliance. It works on MySQL Databases at this moment of time and is database specific.
 
@@ -14,7 +15,7 @@ DataSage is an open source tool that solves these problems by enabling the follo
 
 ## Architecture Diagram:
 
-
+![DataSage High Level Design](./assets/architecture-datasage.png)
 
 ## How does it work?
 
