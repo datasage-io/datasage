@@ -56,3 +56,4 @@ Please join the [DataSage Slack channel](datasage-workspace.slack.com) to commun
 
 
 ## License:
+DataSage is licensed under the Apache License, Version 2.0
