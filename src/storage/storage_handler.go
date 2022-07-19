@@ -157,12 +157,12 @@ type ScanDto struct {
 }
 
 func GetAllDefaultClassAndTags() ([]*Tag, []*Class, error) {
-	tagr, err := os.Open("./storage/default/tags.csv")
+	tagr, err := os.Open("/etc/datasage/resources/tags.csv")
 	if err != nil {
 		return []*Tag{}, []*Class{}, err
 	}
 
-	classr, err := os.Open("./storage/default/class.csv")
+	classr, err := os.Open("/etc/datasage/resources/class.csv")
 	if err != nil {
 		return []*Tag{}, []*Class{}, err
 	}
@@ -183,7 +183,7 @@ func GetAllDefaultClassAndTags() ([]*Tag, []*Class, error) {
 	return tags, classes, nil
 }
 func GetStorageInstance() (Storage, error) {
-	return New(StorageConfig{Type: "internal", Path: "datasageD.db"})
+	return New(StorageConfig{Type: "internal", Path: "/etc/datasage/resources/datasage.db"})
 
 }
 
