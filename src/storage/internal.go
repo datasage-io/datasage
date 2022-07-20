@@ -296,7 +296,7 @@ func (insto InternalStorage) AddTag(name string, description string, rules []str
 	}
 	//defer tagInsert.Close()
 	for _, rule := range rules {
-		log.Println("AddTag rule: %v ", rule)
+		log.Println("AddTag rule: ", rule)
 		_, err = tagInsert.Exec(name, description, rule)
 		if err != nil {
 			return err

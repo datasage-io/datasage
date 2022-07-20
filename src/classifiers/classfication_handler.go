@@ -102,7 +102,7 @@ func ScanDataSource(datasource storage.DpDataSource) error {
 		for _, skipDB := range skipDBs {
 
 			if skipDB == sc.Name {
-				log.Info().Msgf("skip DB name:= ", sc.Name)
+				log.Info().Msgf("skip DB name:= %v", sc.Name)
 				skip = true
 			}
 		}
