@@ -3,4 +3,5 @@ project_name: datasage
 build:
   main: src/main.go
   binary: datasage
-  goarch: amd64
+  goarch:
+    - amd64
