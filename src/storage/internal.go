@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"os"
+	"strconv"
 	"sync"
 
 	_ "modernc.org/sqlite"
@@ -122,14 +123,35 @@ func (into InternalStorage) SetSchemaData(dpDbDatabase DpDbDatabase) error {
 		return err
 	}
 	dpDb, err := dbInsert.Exec(dpDbDatabase.Name, dpDbDatabase.Type, dpDbDatabase.DsKey)
+	var dpDbId int64
 	if err != nil {
 		log.Println("error2", err.Error())
-		return err
+		//ignore this error. may be the Schema already got scanned
+		//find the id for this
+		stmnt := "SELECT id FROM dp_databases WHERE name =" + "\"" + dpDbDatabase.Name +
+			"\" AND type =" + "\"" + dpDbDatabase.Type + "\" AND dskey =" + "\"" + dpDbDatabase.DsKey + "\""
+		log.Println(stmnt)
+		//"SELECT  FROM class dp_databases WHERE name  = ? AND type = ? AND dskey = ?"
+		rows, err := into.SqliteConnc.Query(stmnt)
+		if err != nil {
+			return err
+		}
+		var id int64
+		for rows.Next() {
+			err = rows.Scan(&id)
+			if err != nil {
+				log.Println("error2A", err.Error())
+				return err
+			}
+		}
+		rows.Close()
+		dpDbId = id
+	} else {
+		dpDbId, _ = dpDb.LastInsertId()
+		dbInsert.Close()
 	}
-	dpDbId, err := dpDb.LastInsertId()
-
-	dbInsert.Close()
-
+	log.Println("dpDbId", dpDbId)
+	var dbDbTableId int64
 	for _, table := range dpDbDatabase.DpDbTables {
 
 		tableInsert, err := into.SqliteConnc.Prepare(`
@@ -145,11 +167,30 @@ func (into InternalStorage) SetSchemaData(dpDbDatabase DpDbDatabase) error {
 		dbDbTable, err := tableInsert.Exec(table.Name, dpDbId)
 		if err != nil {
 			log.Println("error3b", err.Error())
-			return err
-		}
+			stmnt := "SELECT id FROM dp_db_tables WHERE name =" + "\"" + table.Name +
+				"\" AND dp_db_id = " + strconv.FormatInt(dpDbId, 10)
+			log.Println(stmnt)
+			rows, err := into.SqliteConnc.Query(stmnt)
+			if err != nil {
+				log.Println("error4444", err.Error())
+				return err
+			}
+			var id int64
+			for rows.Next() {
+				err = rows.Scan(&id)
+				if err != nil {
+					log.Println("error55555", err.Error())
+					return err
+				}
+			}
+			dbDbTableId = id
+			rows.Close()
+		} else {
 
-		dbDbTableId, err := dbDbTable.LastInsertId()
-		tableInsert.Close()
+			dbDbTableId, _ = dbDbTable.LastInsertId()
+			tableInsert.Close()
+		}
+		log.Println("dbDbTableId", dbDbTableId)
 
 		columnInsert, err := into.SqliteConnc.Prepare(`
 		INSERT INTO dp_db_columns ("dp_db_id","dp_db_table_id","column_name","column_type","column_comment","Tags","Classes")
@@ -161,12 +202,28 @@ func (into InternalStorage) SetSchemaData(dpDbDatabase DpDbDatabase) error {
 		}
 
 		for _, column := range table.DpDbColumns {
-
+			log.Println("column:", column)
 			//fmt.Println("INSERT INTO dp_db_columns:", dpDbId, dbDbTableId, column.ColumnName, column.ColumnType, column.ColumnComment)
 			_, err = columnInsert.Exec(dpDbId, dbDbTableId, column.ColumnName, column.ColumnType, column.ColumnComment, column.Tags, column.Classes)
 			if err != nil {
 				log.Println("error5", err.Error())
 				//	continue
+				//insert failed. We try update because column may exists already
+				stmnt := "UPDATE dp_db_columns SET column_type=\"" + column.ColumnType + "\"" +
+					" , column_comment=\"" + column.ColumnComment + "\"" +
+					" , Tags=\"" + column.Tags + "\"" +
+					" , Classes=\"" + column.Classes + "\"" +
+					"  WHERE dp_db_id =" + strconv.FormatInt(dpDbId, 10) + " AND" +
+					" dp_db_table_id =" + strconv.FormatInt(dbDbTableId, 10) + " AND" +
+					" column_name = \"" + column.ColumnName + "\""
+
+				log.Println(stmnt)
+				rows, err := into.SqliteConnc.Query(stmnt)
+				if err != nil {
+					log.Println("error5B", err.Error())
+					return err
+				}
+				rows.Close()
 			}
 
 		}
@@ -198,7 +255,7 @@ func getInternalStorageInstance(dsn string) (InternalStorage, error) {
 }
 func NewInternalStorage(dsn string) (InternalStorage, error) {
 
-	log.Println("NewInternalStorage enter")
+	log.Println("NewInternalStorage enter", dsn)
 	var isnew bool
 	_, err := os.Stat(dsn)
 	if os.IsNotExist(err) {
@@ -248,6 +305,19 @@ func (insto InternalStorage) AddTag(name string, description string, rules []str
 	tagInsert.Close()
 	log.Println("AddTag done")
 	return nil
+}
+
+func (insto InternalStorage) AddClass(description string, rule string, class string) error {
+
+	classInsert, err := insto.SqliteConnc.Prepare(`
+	INSERT INTO class ("description","rule","class")
+	 VALUES (?,?,?);
+	`)
+	_, err = classInsert.Exec(description, rule, class)
+
+	classInsert.Close()
+	return err
+
 }
 
 func (insto InternalStorage) DeleteTag(id int64) error {
