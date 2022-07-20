@@ -27,8 +27,6 @@ jobs:
           version: latest
           args: release --rm-dist
           workdir: datasage/src
-          goos:
-            - linux
           goarch:
             - amd64
         env:
