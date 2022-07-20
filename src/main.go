@@ -18,7 +18,7 @@ var configFilePath *string
 var log *zerolog.Logger = logger.GetInstance()
 
 func main() {
-	configFilePath = flag.String("config-path", "conf/", "conf/")
+	configFilePath = flag.String("config-path", "/etc/datasage/conf/", "conf/")
 	loadConfig()
 	wg.Add(1)
 	//start integration component dependent servers
