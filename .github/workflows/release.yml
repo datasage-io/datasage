@@ -26,8 +26,9 @@ jobs:
           distribution: goreleaser
           version: latest
           args: release --rm-dist
-          workdir: datasage/src
           goarch:
             - amd64
+          workdir: src
+          binary: datasage
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

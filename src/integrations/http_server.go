@@ -32,6 +32,7 @@ func loghandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+
 var config, _ = ReadLogConfig("/etc/datasage/conf/datasage.yaml")
 
 func RunServer() {
