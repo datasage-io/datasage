@@ -31,6 +31,7 @@ func main() {
 }
 func loadConfig() {
 	viper.SetConfigName("datasage")
+	
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(*configFilePath)
 	if err := viper.ReadInConfig(); err != nil {
