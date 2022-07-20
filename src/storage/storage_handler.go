@@ -25,18 +25,18 @@ CREATE TABLE IF NOT EXISTS "tag" (
 );
 CREATE TABLE IF NOT EXISTS "dp_databases" (
 	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
-	"name" TEXT,
-	"type" TEXT,
+	"name" TEXT NOT NULL,
+	"type" TEXT NOT NULL,
 	"dskey" TEXT NOT NULL
   );
   CREATE TABLE IF NOT EXISTS  "dp_db_tables" (
 	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
-	"name" TEXT DEFAULT NULL,
-	"dp_db_id" INTEGER DEFAULT NULL
+	"name" TEXT NOT NULL,
+	"dp_db_id" INTEGER NOT NULL
   );
   CREATE TABLE IF NOT EXISTS  "dp_db_columns" (
 	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
-	"dp_db_id" INTEGER DEFAULT NULL,
+	"dp_db_id" INTEGER NOT NULL,
 	"dp_db_table_id" INTEGER NOT NULL,
 	"column_name" TEXT NOT NULL,
 	"column_type" TEXT NOT NULL,
@@ -57,6 +57,9 @@ CREATE TABLE IF NOT EXISTS "dp_databases" (
 	"User" TEXT NOT NULL,
 	"Password" TEXT NOT NULL
   ) ;
+  CREATE UNIQUE INDEX index_databases ON dp_databases(name,type,dskey);
+  CREATE UNIQUE INDEX index_tables ON dp_db_tables(dp_db_id,name);
+  CREATE UNIQUE INDEX index_columns ON dp_db_columns(dp_db_id,dp_db_table_id,column_name);
 `
 
 type Class struct {
@@ -78,6 +81,7 @@ type StorageConfig struct {
 }
 type Storage interface {
 	GetClasses() ([]Class, error)
+	AddClass(string, string, string) error
 	GetTags() ([]Tag, error)
 	AddTag(string, string, []string) error
 
