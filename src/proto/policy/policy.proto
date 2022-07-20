@@ -1,0 +1,24 @@
+syntax = "proto3";
+ 
+package policy;
+ 
+option go_package = "github.com/datasage-io/datasage/proto/policy";
+ 
+
+//RPC Service 
+service Policy {
+   rpc ReadPolicy ( ReadPolicyYAMLFile ) returns ( PolicyResponse );
+}
+
+//Read a Policy YAML
+message ReadPolicyYAMLFile {
+    string policy = 1;
+}
+
+//Response For Policy 
+message PolicyResponse {
+    string message = 1;
+}
+
+
+
