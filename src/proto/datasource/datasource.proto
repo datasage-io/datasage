@@ -78,7 +78,7 @@ message datasourceLogResponseStruct {
    string datasource        = 1;
    string database          = 2;
    string table             = 3;
-   string columns           = 4; 
+   string column            = 4; 
    repeated string tags     = 5;
    repeated string classes  = 6;
    string lastScanTime      = 7; 
