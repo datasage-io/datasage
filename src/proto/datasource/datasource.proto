@@ -10,6 +10,7 @@ service Datasource {
    rpc AddDatasource ( addRequest ) returns (  messageResponse );
    rpc ListDatasource ( listRequest ) returns (  listResponse );
    rpc DeleteDatasource ( deleteRequest ) returns (  messageResponse );
+   rpc LogDatasource ( datasourceLogRequest ) returns (  datasourceLogResponse );
 }
 
 //Request for Create Datasource 
@@ -64,3 +65,26 @@ message ListAll {
    string    created_at   = 8;
 }
 
+//Request for datasource log
+message datasourceLogRequest {
+   string datasource       = 1;
+   string database         = 2;
+   string table            = 3;
+   repeated string columns = 4; 
+}
+
+//datasource log Response Structure 
+message datasourceLogResponseStruct {
+   string datasource        = 1;
+   string database          = 2;
+   string table             = 3;
+   string column            = 4; 
+   repeated string tags     = 5;
+   repeated string classes  = 6;
+   string lastScanTime      = 7; 
+}
+
+//log Response 
+message datasourceLogResponse {
+   repeated datasourceLogResponseStruct datasourceLog = 1;
+}

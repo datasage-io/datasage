@@ -25,6 +25,7 @@ type DatasourceClient interface {
 	AddDatasource(ctx context.Context, in *AddRequest, opts ...grpc.CallOption) (*MessageResponse, error)
 	ListDatasource(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListResponse, error)
 	DeleteDatasource(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*MessageResponse, error)
+	LogDatasource(ctx context.Context, in *DatasourceLogRequest, opts ...grpc.CallOption) (*DatasourceLogResponse, error)
 }
 
 type datasourceClient struct {
@@ -62,6 +63,15 @@ func (c *datasourceClient) DeleteDatasource(ctx context.Context, in *DeleteReque
 	return out, nil
 }
 
+func (c *datasourceClient) LogDatasource(ctx context.Context, in *DatasourceLogRequest, opts ...grpc.CallOption) (*DatasourceLogResponse, error) {
+	out := new(DatasourceLogResponse)
+	err := c.cc.Invoke(ctx, "/datasource.Datasource/LogDatasource", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DatasourceServer is the server API for Datasource service.
 // All implementations must embed UnimplementedDatasourceServer
 // for forward compatibility
@@ -69,6 +79,7 @@ type DatasourceServer interface {
 	AddDatasource(context.Context, *AddRequest) (*MessageResponse, error)
 	ListDatasource(context.Context, *ListRequest) (*ListResponse, error)
 	DeleteDatasource(context.Context, *DeleteRequest) (*MessageResponse, error)
+	LogDatasource(context.Context, *DatasourceLogRequest) (*DatasourceLogResponse, error)
 	mustEmbedUnimplementedDatasourceServer()
 }
 
@@ -84,6 +95,9 @@ func (UnimplementedDatasourceServer) ListDatasource(context.Context, *ListReques
 }
 func (UnimplementedDatasourceServer) DeleteDatasource(context.Context, *DeleteRequest) (*MessageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteDatasource not implemented")
+}
+func (UnimplementedDatasourceServer) LogDatasource(context.Context, *DatasourceLogRequest) (*DatasourceLogResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LogDatasource not implemented")
 }
 func (UnimplementedDatasourceServer) mustEmbedUnimplementedDatasourceServer() {}
 
@@ -152,6 +166,24 @@ func _Datasource_DeleteDatasource_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Datasource_LogDatasource_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DatasourceLogRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DatasourceServer).LogDatasource(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/datasource.Datasource/LogDatasource",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DatasourceServer).LogDatasource(ctx, req.(*DatasourceLogRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Datasource_ServiceDesc is the grpc.ServiceDesc for Datasource service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -170,6 +202,10 @@ var Datasource_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteDatasource",
 			Handler:    _Datasource_DeleteDatasource_Handler,
+		},
+		{
+			MethodName: "LogDatasource",
+			Handler:    _Datasource_LogDatasource_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
