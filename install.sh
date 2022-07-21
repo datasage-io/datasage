@@ -1,5 +1,7 @@
 #!/bin/bash
 
+VERSION=$1
+
 latest_datasage_download_url(){
 	curl -s https://api.github.com/repos/datasage-io/datasage/releases/latest \
 		| grep "browser_download_url.*tar.gz" \
@@ -14,17 +16,30 @@ latest_datasage_cli_download_url(){
 		| tr -d \"
 }
 
-download_datasage(){
-	echo "Downloading latest datasage release..."
+download_datasage_latest(){
+	echo "Downloading latest datasage release...$VERSION"
 	curl -s -L -o datasage.tar.gz $(latest_datasage_download_url)
-	echo "Downloading datasage version {$1}"
 	tar -xvf datasage.tar.gz
 	mv datasage /usr/local/bin/
 }
 
-download_datasage_cli(){
+download_datasage_cli_latest(){
 	echo "Downloading latest datasage-cli..."
 	curl -s -L -o datasage-cli.tar.gz $(latest_datasage_cli_download_url) 
+	tar -xvf datasage-cli.tar.gz
+	mv datasage-cli /usr/local/bin/
+}
+
+download_datasage_version(){
+	echo "Downloading datasage version: $VERSION"
+	curl -s -L -o datasage.tar.gz "https://github.com/datasage-io/datasage/releases/download/${VERSION}/datasage_${VERSION}_linux_amd64.tar.gz"
+	tar -xvf datasage.tar.gz
+	mv datasage /usr/local/bin/
+}
+
+download_datasage_cli_version(){
+	echo "Downloading datasage-cli version: $VERSION"
+	curl -s -L -o datasage-cli.tar.gz "https://github.com/datasage-io/datasage-cli/releases/download/${VERSION}/datasage-cli_${VERSION}_linux_amd64.tar.gz"
 	tar -xvf datasage-cli.tar.gz
 	mv datasage-cli /usr/local/bin/
 }
@@ -56,8 +71,13 @@ cleanup(){
 	echo "Installation complete!"
 }
 
-download_datasage
-download_datasage_cli
+if [ -z "$1" ]; then
+    download_datasage_latest
+	download_datasage_cli_latest
+else
+    download_datasage_version
+	download_datasage_cli_version
+fi
 download_csv
 download_config
 copy_csv_to_resources
