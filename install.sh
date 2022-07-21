@@ -73,10 +73,10 @@ cleanup(){
 
 if [ -z "$1" ]; then
     download_datasage_latest
-	download_datasage_cli_latest
+    download_datasage_cli_latest
 else
     download_datasage_version
-	download_datasage_cli_version
+    download_datasage_cli_version
 fi
 download_csv
 download_config
