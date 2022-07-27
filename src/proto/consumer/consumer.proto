@@ -1,3 +1,4 @@
+
 syntax = "proto3";
 
 option go_package = "github.com/datasage-io/datasage/proto/consumer";
@@ -9,6 +10,7 @@ service Consumer {
     rpc Start (ConsumerRequest) returns (ConsumerResponse);
     rpc Stop (ConsumerRequest) returns (ConsumerResponse);
 }
+
 message ConsumerRequest {
     string feedtype = 1;
 }

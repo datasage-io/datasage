@@ -9,6 +9,7 @@ import (
 
 	logger "github.com/datasage-io/datasage/src/logger"
 
+	"github.com/datasage-io/datasage/src/classifiers"
 	classpb "github.com/datasage-io/datasage/src/proto/class"
 	ds "github.com/datasage-io/datasage/src/proto/datasource"
 	tagpb "github.com/datasage-io/datasage/src/proto/tag"
@@ -43,7 +44,24 @@ type ClassServer struct {
 
 func (d *ClassServer) AddClass(ctx context.Context, in *classpb.CreateRequest) (*classpb.MessageResponse, error) {
 	fmt.Println("AddClass : ", in)
-	return nil, nil
+	st, err := storage.GetStorageInstance()
+	if err != nil {
+		log.Error().Err(err).Msg("Internal Error")
+	} else {
+		rules := in.GetTag()
+		log.Debug().Msgf("rules %v", rules)
+		for _, rule := range rules {
+			log.Debug().Msgf("Rule  className %v", rule)
+
+			err := st.AddClass(in.GetDescription(), rule, in.GetName())
+			if err != nil {
+				log.Error().Err(err).Msg("Internal Error")
+			}
+		}
+		return &classpb.MessageResponse{Message: "Class Added sucessfully"}, nil
+	}
+	return &classpb.MessageResponse{Message: "Error in adding Class "}, nil
+
 }
 func (d *ClassServer) ListClass(ctx context.Context, in *classpb.ListRequest) (*classpb.ListResponse, error) {
 	fmt.Println("ListClass : ", in)
@@ -57,7 +75,6 @@ func (d *ClassServer) ListClass(ctx context.Context, in *classpb.ListRequest) (*
 	classesOut := []*classpb.ClassResponse{}
 	for _, class := range classes {
 		log.Debug().Msgf("ListTag %v", class)
-		//classes := []string{tag.Rule}
 		classOut := &classpb.ClassResponse{
 			Id:          strconv.Itoa(class.Id),
 			Name:        class.Rule,
@@ -157,11 +174,16 @@ func (d *DatasourceServer) AddDatasource(ctx context.Context, in *ds.AddRequest)
 		DsKey:        uuid.New().String(),
 	}
 
-	err1 := st.AddDataSource(storageDpDataSourceObj)
-	if err1 != nil {
-		return &ds.StatusResponse{}, nil
+	err = st.AddDataSource(storageDpDataSourceObj)
+	if err != nil {
+		return &ds.StatusResponse{DataSourceAddFailed: "Error"}, nil
+	} else {
+		err := classifiers.ScanDataSource(storageDpDataSourceObj)
+		if err != nil {
+			return &ds.StatusResponse{DataSourceInitialScanFailed: "Failed to Scan Datasource "}, nil
+		}
 	}
-	return &ds.StatusResponse{}, nil
+	return &ds.StatusResponse{DataSourceAddedSucessful: "Data Source added for Scaning"}, nil
 }
 func (d *DatasourceServer) ListDatasource(ctx context.Context, in *ds.ListRequest) (*ds.ListResponse, error) {
 	fmt.Println("List Datasource Request ", in)

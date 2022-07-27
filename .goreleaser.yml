@@ -1,0 +1,9 @@
+
+project_name: datasage
+build:
+  main: src/main.go
+  binary: datasage
+  goos:
+    - linux
+  goarch:
+    - amd64

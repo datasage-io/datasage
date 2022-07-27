@@ -55,7 +55,7 @@ require (
 )
 
 require (
-	github.com/confluentinc/confluent-kafka-go v1.8.2
+	github.com/confluentinc/confluent-kafka-go v1.9.1
 	github.com/spf13/viper v1.12.0
 	gopkg.in/yaml.v2 v2.4.0
 )
