@@ -136,7 +136,7 @@ func (d *TagServer) DeleteTag(ctx context.Context, in *tagpb.DeleteRequest) (*ta
 
 }
 
-func (d *DatasourceServer) AddDatasource(ctx context.Context, in *ds.AddRequest) (*ds.MessageResponse, error) {
+func (d *DatasourceServer) AddDatasource(ctx context.Context, in *ds.AddRequest) (*ds.StatusResponse, error) {
 	fmt.Println("Add Datasource Request --- ", in)
 	st, err := storage.GetStorageInstance()
 	if err != nil {
@@ -159,9 +159,9 @@ func (d *DatasourceServer) AddDatasource(ctx context.Context, in *ds.AddRequest)
 
 	err1 := st.AddDataSource(storageDpDataSourceObj)
 	if err1 != nil {
-		return &ds.MessageResponse{Message: "Error"}, nil
+		return &ds.StatusResponse{}, nil
 	}
-	return &ds.MessageResponse{Message: "Sucess"}, nil
+	return &ds.StatusResponse{}, nil
 }
 func (d *DatasourceServer) ListDatasource(ctx context.Context, in *ds.ListRequest) (*ds.ListResponse, error) {
 	fmt.Println("List Datasource Request ", in)
