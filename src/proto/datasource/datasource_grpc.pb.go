@@ -22,7 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DatasourceClient interface {
-	AddDatasource(ctx context.Context, in *AddRequest, opts ...grpc.CallOption) (*MessageResponse, error)
+	AddDatasource(ctx context.Context, in *AddRequest, opts ...grpc.CallOption) (*StatusResponse, error)
 	ListDatasource(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListResponse, error)
 	DeleteDatasource(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*MessageResponse, error)
 	LogDatasource(ctx context.Context, in *DatasourceLogRequest, opts ...grpc.CallOption) (*DatasourceLogResponse, error)
@@ -36,8 +36,8 @@ func NewDatasourceClient(cc grpc.ClientConnInterface) DatasourceClient {
 	return &datasourceClient{cc}
 }
 
-func (c *datasourceClient) AddDatasource(ctx context.Context, in *AddRequest, opts ...grpc.CallOption) (*MessageResponse, error) {
-	out := new(MessageResponse)
+func (c *datasourceClient) AddDatasource(ctx context.Context, in *AddRequest, opts ...grpc.CallOption) (*StatusResponse, error) {
+	out := new(StatusResponse)
 	err := c.cc.Invoke(ctx, "/datasource.Datasource/AddDatasource", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -76,7 +76,7 @@ func (c *datasourceClient) LogDatasource(ctx context.Context, in *DatasourceLogR
 // All implementations must embed UnimplementedDatasourceServer
 // for forward compatibility
 type DatasourceServer interface {
-	AddDatasource(context.Context, *AddRequest) (*MessageResponse, error)
+	AddDatasource(context.Context, *AddRequest) (*StatusResponse, error)
 	ListDatasource(context.Context, *ListRequest) (*ListResponse, error)
 	DeleteDatasource(context.Context, *DeleteRequest) (*MessageResponse, error)
 	LogDatasource(context.Context, *DatasourceLogRequest) (*DatasourceLogResponse, error)
@@ -87,7 +87,7 @@ type DatasourceServer interface {
 type UnimplementedDatasourceServer struct {
 }
 
-func (UnimplementedDatasourceServer) AddDatasource(context.Context, *AddRequest) (*MessageResponse, error) {
+func (UnimplementedDatasourceServer) AddDatasource(context.Context, *AddRequest) (*StatusResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddDatasource not implemented")
 }
 func (UnimplementedDatasourceServer) ListDatasource(context.Context, *ListRequest) (*ListResponse, error) {
