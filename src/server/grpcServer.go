@@ -153,7 +153,7 @@ func (d *TagServer) DeleteTag(ctx context.Context, in *tagpb.DeleteRequest) (*ta
 
 }
 
-func (d *DatasourceServer) AddDatasource(ctx context.Context, in *ds.AddRequest) (*ds.MessageResponse, error) {
+func (d *DatasourceServer) AddDatasource(ctx context.Context, in *ds.AddRequest) (*ds.StatusResponse, error) {
 	fmt.Println("Add Datasource Request --- ", in)
 	st, err := storage.GetStorageInstance()
 	if err != nil {
@@ -176,14 +176,14 @@ func (d *DatasourceServer) AddDatasource(ctx context.Context, in *ds.AddRequest)
 
 	err = st.AddDataSource(storageDpDataSourceObj)
 	if err != nil {
-		return &ds.MessageResponse{Message: "Error"}, nil
+		return &ds.StatusResponse{DataSourceAddFailed: "Error"}, nil
 	} else {
 		err := classifiers.ScanDataSource(storageDpDataSourceObj)
 		if err != nil {
-			return &ds.MessageResponse{Message: "Failed to Scan Datasource "}, nil
+			return &ds.StatusResponse{DataSourceInitialScanFailed: "Failed to Scan Datasource "}, nil
 		}
 	}
-	return &ds.MessageResponse{Message: "Data Source added for Scaning"}, nil
+	return &ds.StatusResponse{DataSourceAddedSucessful: "Data Source added for Scaning"}, nil
 }
 func (d *DatasourceServer) ListDatasource(ctx context.Context, in *ds.ListRequest) (*ds.ListResponse, error) {
 	fmt.Println("List Datasource Request ", in)
