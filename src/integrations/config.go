@@ -2,9 +2,8 @@ package integrations
 
 import (
 	"log"
-	"os"
 
-	"gopkg.in/yaml.v2"
+	"github.com/spf13/viper"
 )
 
 type Config struct {
@@ -27,16 +26,13 @@ type KafkaLogConfig struct {
 	Port   string
 }
 
-func ReadLogConfig(path string) (Config, error) {
+func ReadLogConfig() (Config, error) {
+	log.Printf("ReadLogConfig")
 	config := Config{}
-	data, err := os.ReadFile(path)
-	if err != nil {
+	if err := viper.Unmarshal(&config); err != nil {
 		log.Printf("err: %s", err)
-		return config, err
-	}
-	if yaml.Unmarshal(data, &config) != nil {
-		log.Printf("err: %s", err)
-		return config, err
+		log.Fatal(err)
+
 	}
 	return config, nil
 }

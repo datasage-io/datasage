@@ -2,13 +2,16 @@ package storage
 
 import (
 	"database/sql"
-	"log"
 	"os"
 	"strconv"
 	"sync"
 
+	logger "github.com/datasage-io/datasage/src/logger"
+	"github.com/rs/zerolog"
 	_ "modernc.org/sqlite"
 )
+
+var log *zerolog.Logger = logger.GetInstance()
 
 type InternalStorage struct {
 	SqliteConnc *sql.DB
@@ -49,20 +52,28 @@ func (into InternalStorage) AddDataSource(dpDataSource DpDataSource) error {
 	VALUES (?,?,?,?,?,?,?,?,?,?);
 	`)
 	if errP != nil {
-		log.Println("Prepare statement error :", errP.Error())
+		//log.Println("Prepare statement error :", errP.Error())
 		return errP
 	}
 	defer dbInsert.Close()
-	_, errE := dbInsert.Exec(dpDataSource.Datadomain, dpDataSource.Dsname, dpDataSource.Dsdecription, dpDataSource.Dstype, dpDataSource.DsKey, dpDataSource.Dsversion, dpDataSource.Host, dpDataSource.Port, dpDataSource.User, dpDataSource.Password)
-	if errE != nil {
-		log.Println("Exec statement error", errE.Error())
-		return errE
+	if _, err := dbInsert.Exec(dpDataSource.Datadomain,
+		dpDataSource.Dsname,
+		dpDataSource.Dsdecription,
+		dpDataSource.Dstype,
+		dpDataSource.DsKey,
+		dpDataSource.Dsversion,
+		dpDataSource.Host,
+		dpDataSource.Port,
+		dpDataSource.User,
+		dpDataSource.Password); err != nil {
+		log.Error().Err(err).Msg("AddDataSource")
+		return err
 	}
 	return nil
 }
 
 func (into InternalStorage) GetDataSources() ([]DpDataSource, error) {
-	log.Println("InternalStorage GetDpDataSources")
+	log.Trace().Msgf("InternalStorage GetDpDataSources")
 	dataSources := []DpDataSource{}
 
 	rows, err := into.SqliteConnc.Query("SELECT * FROM DpDataSource")
@@ -90,57 +101,54 @@ func (into InternalStorage) GetDataSources() ([]DpDataSource, error) {
 }
 
 func (into InternalStorage) DeleteDataSources(ids []int64) (bool, error) {
-	log.Println("InternalStorage DeleteDpDataSources", ids)
+	log.Trace().Msgf("InternalStorage DeleteDataSources %v", ids)
 	for _, dsid := range ids {
-		res, err := into.SqliteConnc.Exec("DELETE FROM DpDataSource where ID=$1", dsid)
-		if err == nil {
+		if res, err := into.SqliteConnc.Exec("DELETE FROM DpDataSource where ID=$1", dsid); err == nil {
 			count, err := res.RowsAffected()
-			log.Println("InternalStorage DeleteDpDataSources count is ", count)
+			log.Debug().Msgf("DeleteDpDataSources count is %v", count)
 			if err == nil && count > 0 {
-
 				return true, nil
 			}
-
 		} else {
-			log.Println(err)
+			log.Error().Err(err).Msg("DeleteDataSources")
 		}
 	}
-	log.Println("InternalStorage DeleteDpDataSources count exit ")
-
 	return false, nil
 }
 
 func (into InternalStorage) SetSchemaData(dpDbDatabase DpDbDatabase) error {
-
-	log.Println("InternalStorage SetSchemaData", dpDbDatabase.Name)
+	log.Trace().Msgf("InternalStorage SetSchemaData %v", dpDbDatabase)
 
 	dbInsert, err := into.SqliteConnc.Prepare(`
 	INSERT INTO dp_databases ("name","type","dskey")
 	VALUES (?,?,?);
 	`)
-	if err != nil {
-		log.Println("error1", err.Error())
-		return err
-	}
+	/*
+		if err != nil {
+			log.Error().Err(err).Msg("SetSchemaData")
+			return err
+		}
+	*/
 	dpDb, err := dbInsert.Exec(dpDbDatabase.Name, dpDbDatabase.Type, dpDbDatabase.DsKey)
 	var dpDbId int64
 	if err != nil {
-		log.Println("error2", err.Error())
+		//log.Error().Err(err).Msg("dbInsert")
 		//ignore this error. may be the Schema already got scanned
 		//find the id for this
 		stmnt := "SELECT id FROM dp_databases WHERE name =" + "\"" + dpDbDatabase.Name +
 			"\" AND type =" + "\"" + dpDbDatabase.Type + "\" AND dskey =" + "\"" + dpDbDatabase.DsKey + "\""
-		log.Println(stmnt)
-		//"SELECT  FROM class dp_databases WHERE name  = ? AND type = ? AND dskey = ?"
+		log.Debug().Msgf("stmnt is: %v", stmnt)
+
 		rows, err := into.SqliteConnc.Query(stmnt)
 		if err != nil {
+			log.Error().Err(err).Msg("select exec")
 			return err
 		}
 		var id int64
 		for rows.Next() {
 			err = rows.Scan(&id)
 			if err != nil {
-				log.Println("error2A", err.Error())
+				log.Error().Err(err).Msg("select scan")
 				return err
 			}
 		}
@@ -150,7 +158,9 @@ func (into InternalStorage) SetSchemaData(dpDbDatabase DpDbDatabase) error {
 		dpDbId, _ = dpDb.LastInsertId()
 		dbInsert.Close()
 	}
-	log.Println("dpDbId", dpDbId)
+
+	log.Debug().Msgf("dpDbId: %v", dpDbId)
+
 	var dbDbTableId int64
 	for _, table := range dpDbDatabase.DpDbTables {
 
@@ -159,27 +169,28 @@ func (into InternalStorage) SetSchemaData(dpDbDatabase DpDbDatabase) error {
 		 VALUES (?,?);
 		`)
 		if err != nil {
-			log.Println("error3", err.Error())
+			log.Error().Err(err).Msg("insert prep")
 			return err
 		}
 
 		//fmt.Println("INSERT INTO dp_db_tables :", table.Name, dpDbId)
 		dbDbTable, err := tableInsert.Exec(table.Name, dpDbId)
 		if err != nil {
-			log.Println("error3b", err.Error())
+			//log.Error().Err(err).Msg("insert exec")
 			stmnt := "SELECT id FROM dp_db_tables WHERE name =" + "\"" + table.Name +
 				"\" AND dp_db_id = " + strconv.FormatInt(dpDbId, 10)
-			log.Println(stmnt)
+			log.Debug().Msgf("stmnt is: %v", stmnt)
+
 			rows, err := into.SqliteConnc.Query(stmnt)
 			if err != nil {
-				log.Println("error4444", err.Error())
+				log.Error().Err(err).Msg("select exec")
 				return err
 			}
 			var id int64
 			for rows.Next() {
 				err = rows.Scan(&id)
 				if err != nil {
-					log.Println("error55555", err.Error())
+					log.Error().Err(err).Msg("select scan")
 					return err
 				}
 			}
@@ -190,23 +201,24 @@ func (into InternalStorage) SetSchemaData(dpDbDatabase DpDbDatabase) error {
 			dbDbTableId, _ = dbDbTable.LastInsertId()
 			tableInsert.Close()
 		}
-		log.Println("dbDbTableId", dbDbTableId)
+		log.Debug().Msgf("TableId: %v", dbDbTableId)
 
 		columnInsert, err := into.SqliteConnc.Prepare(`
 		INSERT INTO dp_db_columns ("dp_db_id","dp_db_table_id","column_name","column_type","column_comment","Tags","Classes")
 		 VALUES (?,?,?,?,?,?,?);
 		`)
 		if err != nil {
-			log.Println("error4", err.Error())
+			//log.Error().Err(err).Msg("insert prep")
 			continue
 		}
 
 		for _, column := range table.DpDbColumns {
-			log.Println("column:", column)
+			log.Debug().Msgf("column: %v", column)
+
 			//fmt.Println("INSERT INTO dp_db_columns:", dpDbId, dbDbTableId, column.ColumnName, column.ColumnType, column.ColumnComment)
 			_, err = columnInsert.Exec(dpDbId, dbDbTableId, column.ColumnName, column.ColumnType, column.ColumnComment, column.Tags, column.Classes)
 			if err != nil {
-				log.Println("error5", err.Error())
+				//log.Error().Err(err).Msg("insert exec")
 				//	continue
 				//insert failed. We try update because column may exists already
 				stmnt := "UPDATE dp_db_columns SET column_type=\"" + column.ColumnType + "\"" +
@@ -217,20 +229,20 @@ func (into InternalStorage) SetSchemaData(dpDbDatabase DpDbDatabase) error {
 					" dp_db_table_id =" + strconv.FormatInt(dbDbTableId, 10) + " AND" +
 					" column_name = \"" + column.ColumnName + "\""
 
-				log.Println(stmnt)
+				log.Debug().Msgf("stmnt is: %v", stmnt)
+
 				rows, err := into.SqliteConnc.Query(stmnt)
 				if err != nil {
-					log.Println("error5B", err.Error())
+					log.Error().Err(err).Msg("update")
 					return err
 				}
 				rows.Close()
 			}
-
 		}
 		columnInsert.Close()
-
 	}
-	log.Println("InternalStorage SetSchemaData done")
+
+	log.Trace().Msgf("InternalStorage SetSchemaData execution completed")
 	return err
 }
 
@@ -254,12 +266,11 @@ func getInternalStorageInstance(dsn string) (InternalStorage, error) {
 	return instance, nil
 }
 func NewInternalStorage(dsn string) (InternalStorage, error) {
-
-	log.Println("NewInternalStorage enter", dsn)
+	log.Trace().Msgf("NewInternalStorage enter %v", dsn)
 	var isnew bool
 	_, err := os.Stat(dsn)
 	if os.IsNotExist(err) {
-		log.Println("Creating sqlite database ", dsn)
+		log.Debug().Msgf("Creating sqlite database : %v", dsn)
 		_, err := os.OpenFile(dsn, os.O_CREATE|os.O_WRONLY, 0660)
 		isnew = true
 		if err != nil {
@@ -272,21 +283,22 @@ func NewInternalStorage(dsn string) (InternalStorage, error) {
 	}
 	insto := InternalStorage{Path: dsn, SqliteConnc: db}
 	if isnew {
-		log.Println("Inserting Default data")
+		log.Debug().Msgf("Inserting Default data")
 		tags, classes, err := GetAllDefaultClassAndTags()
 		if err != nil {
 			return InternalStorage{}, err
 		}
 		err = insto.InsertDefaultData(tags, classes)
 	}
-	log.Println("NewInternalStorage exit")
+	log.Trace().Msgf("NewInternalStorage exit %v", dsn)
 
 	return insto, nil
 
 }
 
 func (insto InternalStorage) AddTag(name string, description string, rules []string) error {
-	log.Println("AddTag ")
+	log.Trace().Msgf("AddTag name:  %v des: %v  rules: %v  ", name, description, rules)
+
 	tagInsert, err := insto.SqliteConnc.Prepare(`
 	INSERT INTO tag ("tag_name","description","rule")
 	 VALUES (?,?,?);
@@ -296,18 +308,18 @@ func (insto InternalStorage) AddTag(name string, description string, rules []str
 	}
 	//defer tagInsert.Close()
 	for _, rule := range rules {
-		log.Println("AddTag rule: ", rule)
+		log.Debug().Msgf("AddTag rule:: %v", rule)
 		_, err = tagInsert.Exec(name, description, rule)
 		if err != nil {
 			return err
 		}
 	}
 	tagInsert.Close()
-	log.Println("AddTag done")
 	return nil
 }
 
 func (insto InternalStorage) AddClass(description string, rule string, class string) error {
+	log.Trace().Msgf("AddClass description:  %v rule: %v  class: %v  ", description, rule, class)
 
 	classInsert, err := insto.SqliteConnc.Prepare(`
 	INSERT INTO class ("description","rule","class")

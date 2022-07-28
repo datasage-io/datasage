@@ -105,6 +105,7 @@ func GetInstance() *zerolog.Logger {
 			Compress:              true,
 		}
 		customLogger = configure(config)
+
 	})
 	return customLogger
 }
