@@ -35,30 +35,29 @@ func Run() {
 	scanInterval := viper.GetInt("classifiers.dbschema-scan-interval")
 	ticker := time.NewTicker(time.Duration(scanInterval) * time.Minute)
 	for ; ; <-ticker.C {
-		fmt.Println("starting a scan")
+		log.Debug().Msg("periodic scan started")
 		st, err := storage.GetStorageInstance()
 		if err != nil {
-			log.Error().Err(err).Msg("Internal Error")
+			log.Error().Err(err).Msg("GetStorageInstance Internal Error")
 			continue
 		}
 
 		datasources, err := st.GetDataSources()
 		if err != nil {
-			fmt.Println("Datasources not found  ")
+			log.Error().Err(err).Msg("Datasources not found")
 		}
 		for _, datasource := range datasources {
-			fmt.Println(datasource)
 			ScanDataSource(datasource)
-
-			log.Info().Msgf("scan completed for datasource: %v", datasource.Host)
 		}
+		log.Debug().Msg(" periodic scan completed")
+
 	}
 
 }
 
 func ScanDataSource(datasource storage.DpDataSource) error {
+	log.Debug().Msgf("ScanDataSource started %v", datasource)
 
-	fmt.Println("starting  scan for ", datasource)
 	st, err := storage.GetStorageInstance()
 	if err != nil {
 		log.Error().Err(err).Msg("Internal Error")
@@ -175,7 +174,7 @@ func ScanDataSource(datasource storage.DpDataSource) error {
 		}
 
 	}
-	log.Info().Msgf("scan completed for datasource: %v", datasource.Host)
+	log.Trace().Msgf("scan completed for datasource: %v", datasource)
 	return nil
 }
 

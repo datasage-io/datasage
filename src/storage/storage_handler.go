@@ -2,11 +2,11 @@ package storage
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"time"
 
 	"github.com/gocarina/gocsv"
+	"github.com/spf13/viper"
 )
 
 var initSchema = `
@@ -161,12 +161,18 @@ type ScanDto struct {
 }
 
 func GetAllDefaultClassAndTags() ([]*Tag, []*Class, error) {
-	tagr, err := os.Open("/etc/datasage/resources/tags.csv")
+
+	defaultTagsFile := viper.GetString("storage.default_tags")
+	defaultClassesFile := viper.GetString("storage.default_classes")
+	log.Debug().Msgf("default Tags File:  %v", defaultTagsFile)
+	log.Debug().Msgf("default Classes File:  %v", defaultClassesFile)
+
+	tagr, err := os.Open(defaultTagsFile)
 	if err != nil {
 		return []*Tag{}, []*Class{}, err
 	}
 
-	classr, err := os.Open("/etc/datasage/resources/class.csv")
+	classr, err := os.Open(defaultClassesFile)
 	if err != nil {
 		return []*Tag{}, []*Class{}, err
 	}
@@ -175,19 +181,22 @@ func GetAllDefaultClassAndTags() ([]*Tag, []*Class, error) {
 	classes := []*Class{}
 
 	if err := gocsv.Unmarshal(tagr, &tags); err != nil {
-		log.Println(err.Error())
+		log.Error().Err(err).Msg("Unmarshal tag failed")
 		return []*Tag{}, []*Class{}, err
 
 	}
 	if err := gocsv.UnmarshalFile(classr, &classes); err != nil {
-		log.Println(err.Error())
+		log.Error().Err(err).Msg("Unmarshal class failed")
 		return []*Tag{}, []*Class{}, err
 
 	}
 	return tags, classes, nil
 }
 func GetStorageInstance() (Storage, error) {
-	return New(StorageConfig{Type: "internal", Path: "/etc/datasage/resources/datasage.db"})
+	stype := viper.GetString("storage.type")
+	spath := viper.GetString("storage.path")
+
+	return New(StorageConfig{Type: stype, Path: spath})
 
 }
 

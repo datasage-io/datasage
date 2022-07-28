@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"sync"
 
 	dataclassifier "github.com/datasage-io/datasage/src/classifiers"
@@ -15,10 +16,14 @@ import (
 
 var wg sync.WaitGroup
 var configFilePath *string
-var log *zerolog.Logger = logger.GetInstance()
+var log = logger.GetInstance()
 
 func main() {
 	configFilePath = flag.String("config-path", "/etc/datasage/conf/", "conf/")
+	flag.Parse()
+
+	log.Debug().Msgf("config path is  %v \n", *configFilePath)
+
 	loadConfig()
 	wg.Add(1)
 	//start integration component dependent servers
@@ -36,10 +41,15 @@ func loadConfig() {
 	if err := viper.ReadInConfig(); err != nil {
 		if readErr, ok := err.(viper.ConfigFileNotFoundError); ok {
 			var log *zerolog.Logger = logger.GetInstance()
-			log.Panic().Msgf("No config file found at %s\n", *configFilePath)
+			log.Panic().Msgf("No config file found at %v\n", *configFilePath)
 		} else {
 			var log *zerolog.Logger = logger.GetInstance()
 			log.Panic().Msgf("Error reading config file: %s\n", readErr)
 		}
 	}
+
+	fmt.Println("logging level:", viper.GetString("logging.level"))
+
+	logger.SetLogLevel(viper.GetString("logging.level"))
+
 }

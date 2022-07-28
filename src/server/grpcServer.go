@@ -194,7 +194,7 @@ func (d *DatasourceServer) ListDatasource(ctx context.Context, in *ds.ListReques
 
 	datasources, err := st.GetDataSources()
 	if err != nil {
-		fmt.Println("ListDatasources error  ")
+		fmt.Println("Datasources not found ")
 	}
 	datasourcesOut := []*ds.ListAll{}
 	for _, datasource := range datasources {
@@ -240,6 +240,12 @@ func (d *DatasourceServer) DeleteDatasource(ctx context.Context, in *ds.DeleteRe
 		return &ds.MessageResponse{Message: "Delete sucessful"}, nil
 	}
 	return &ds.MessageResponse{Message: "Delete failed"}, nil
+}
+
+func (d *DatasourceServer) LogDatasource(ctx context.Context, in *ds.DatasourceLogRequest) (*ds.DatasourceLogResponse, error) {
+
+	return nil, nil
+
 }
 
 // ================= //
