@@ -34,6 +34,7 @@ func loghandler(w http.ResponseWriter, r *http.Request) {
 
 var config, _ = ReadLogConfig()
 
+
 func RunServer() {
 
 	http.HandleFunc("/log", loghandler)

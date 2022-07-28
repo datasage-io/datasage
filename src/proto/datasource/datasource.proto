@@ -7,7 +7,7 @@ option go_package = "github.com/datasage-io/datasage/proto/datasource";
 
 //RPC Service 
 service Datasource {
-   rpc AddDatasource ( addRequest ) returns (  messageResponse );
+   rpc AddDatasource ( addRequest ) returns (  StatusResponse );
    rpc ListDatasource ( listRequest ) returns (  listResponse );
    rpc DeleteDatasource ( deleteRequest ) returns (  messageResponse );
    rpc LogDatasource ( datasourceLogRequest ) returns (  datasourceLogResponse );
@@ -52,6 +52,20 @@ message deleteRequest {
 //Response for  Datasource
 message messageResponse {
    string message = 1;
+}
+
+//Response for datasource step by step execution
+message StatusResponse {
+   string DataSourceAddFailed                 = 1;
+   string DataSourceAddedSucessful            = 2;
+   string DataSourceInitialScanFailed         = 3;
+   string DataSourceInitialScanCompleted      = 4;
+   string DataSourcePeriodicScanFailed        = 5;
+   string DataSourcePeriodicScanCompleted     = 6;
+   string DefaultPoliciesIdentificationFailed = 7;
+   string DefaultPoliciesIdentified           = 8;
+   string PolicyEnforcementFailed             = 9;
+   string PolicyEnforcementCompleted          = 10;
 }
 
 message ListAll {
