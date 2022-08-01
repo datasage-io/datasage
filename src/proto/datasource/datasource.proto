@@ -98,6 +98,6 @@ message datasourceName  {
 
 //ScanMessage 
 message scanResponse {
-   int64  StatusCode  = 1;
+   string StatusCode  = 1;
    string Message     = 2;
 }
