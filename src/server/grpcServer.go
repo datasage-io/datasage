@@ -9,7 +9,6 @@ import (
 
 	logger "github.com/datasage-io/datasage/src/logger"
 
-	"github.com/datasage-io/datasage/src/classifiers"
 	classpb "github.com/datasage-io/datasage/src/proto/class"
 	ds "github.com/datasage-io/datasage/src/proto/datasource"
 	tagpb "github.com/datasage-io/datasage/src/proto/tag"
@@ -153,7 +152,7 @@ func (d *TagServer) DeleteTag(ctx context.Context, in *tagpb.DeleteRequest) (*ta
 
 }
 
-func (d *DatasourceServer) AddDatasource(ctx context.Context, in *ds.AddRequest) (*ds.StatusResponse, error) {
+func (d *DatasourceServer) AddDatasource(ctx context.Context, in *ds.AddRequest) (*ds.MessageResponse, error) {
 	fmt.Println("Add Datasource Request --- ", in)
 	st, err := storage.GetStorageInstance()
 	if err != nil {
@@ -176,14 +175,9 @@ func (d *DatasourceServer) AddDatasource(ctx context.Context, in *ds.AddRequest)
 
 	err = st.AddDataSource(storageDpDataSourceObj)
 	if err != nil {
-		return &ds.StatusResponse{DataSourceAddFailed: "Error"}, nil
-	} else {
-		err := classifiers.ScanDataSource(storageDpDataSourceObj)
-		if err != nil {
-			return &ds.StatusResponse{DataSourceInitialScanFailed: "Failed to Scan Datasource "}, nil
-		}
+		return &ds.MessageResponse{Message: ""}, err
 	}
-	return &ds.StatusResponse{DataSourceAddedSucessful: "Data Source added for Scaning"}, nil
+	return &ds.MessageResponse{Message: "Data Source added for Scaning"}, nil
 }
 func (d *DatasourceServer) ListDatasource(ctx context.Context, in *ds.ListRequest) (*ds.ListResponse, error) {
 	fmt.Println("List Datasource Request ", in)
@@ -245,6 +239,12 @@ func (d *DatasourceServer) DeleteDatasource(ctx context.Context, in *ds.DeleteRe
 func (d *DatasourceServer) LogDatasource(ctx context.Context, in *ds.DatasourceLogRequest) (*ds.DatasourceLogResponse, error) {
 
 	return nil, nil
+
+}
+
+func (d *DatasourceServer) ScanDatasource(ctx context.Context, in *ds.AddRequest) (*ds.MessageResponse, error) {
+	fmt.Println("Request for Scan - ", in)
+	return &ds.MessageResponse{Message: "Scan Completd"}, nil
 
 }
 
