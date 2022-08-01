@@ -11,7 +11,7 @@ service Datasource {
    rpc ListDatasource ( listRequest ) returns (  listResponse );
    rpc DeleteDatasource ( deleteRequest ) returns (  messageResponse );
    rpc LogDatasource ( datasourceLogRequest ) returns (  datasourceLogResponse );
-   rpc Scan ( datasourceName ) returns ( scanResponse );
+   rpc Scan ( datasourceName ) returns ( messageResponse );
 }
 
 //Request for Create Datasource 
@@ -53,7 +53,8 @@ message deleteRequest {
 
 //Response for  Datasource
 message messageResponse {
-   string message = 1;
+   string statusCode  = 1;
+   string message     = 2;
 }
 
 message ListAll {
@@ -94,10 +95,4 @@ message datasourceLogResponse {
 //Datasource Name 
 message datasourceName  {
    string name = 1;
-}
-
-//ScanMessage 
-message scanResponse {
-   string StatusCode  = 1;
-   string Message     = 2;
 }

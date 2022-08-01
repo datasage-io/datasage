@@ -177,7 +177,7 @@ func (d *DatasourceServer) AddDatasource(ctx context.Context, in *ds.AddRequest)
 	if err != nil {
 		return &ds.MessageResponse{Message: ""}, err
 	}
-	return &ds.MessageResponse{Message: "Data Source added for Scaning"}, nil
+	return &ds.MessageResponse{StatusCode: "OK", Message: "Data Source added for Scaning"}, nil
 }
 func (d *DatasourceServer) ListDatasource(ctx context.Context, in *ds.ListRequest) (*ds.ListResponse, error) {
 	fmt.Println("List Datasource Request ", in)
@@ -230,7 +230,7 @@ func (d *DatasourceServer) DeleteDatasource(ctx context.Context, in *ds.DeleteRe
 	if err != nil {
 		log.Error().Err(err).Msg("Internal Error")
 	}
-	if statusDelete == true {
+	if statusDelete {
 		return &ds.MessageResponse{Message: "Delete sucessful"}, nil
 	}
 	return &ds.MessageResponse{Message: "Delete failed"}, nil
@@ -242,9 +242,9 @@ func (d *DatasourceServer) LogDatasource(ctx context.Context, in *ds.DatasourceL
 
 }
 
-func (d *DatasourceServer) Scan(ctx context.Context, in *ds.DatasourceName) (*ds.ScanResponse, error) {
+func (d *DatasourceServer) Scan(ctx context.Context, in *ds.DatasourceName) (*ds.MessageResponse, error) {
 	fmt.Println("Request for Scan - ", in)
-	return &ds.ScanResponse{StatusCode: "OK", Message: "Scan Completed"}, nil
+	return &ds.MessageResponse{StatusCode: "OK", Message: "Scan Completed"}, nil
 
 }
 
