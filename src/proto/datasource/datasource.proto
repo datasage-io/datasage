@@ -11,7 +11,7 @@ service Datasource {
    rpc ListDatasource ( listRequest ) returns (  listResponse );
    rpc DeleteDatasource ( deleteRequest ) returns (  messageResponse );
    rpc LogDatasource ( datasourceLogRequest ) returns (  datasourceLogResponse );
-   rpc Scan ( datasourceName ) returns (  messageResponse );
+   rpc Scan ( datasourceName ) returns ( scanResponse );
 }
 
 //Request for Create Datasource 
@@ -25,6 +25,7 @@ message addRequest {
    string     port         = 8;
    string     user         = 9;
    string     password     = 10;
+   int64      policy_Id     = 11;
 }
 
 //Request for List Datasource
@@ -35,7 +36,7 @@ message listRequest {
    int64 first                 = 4;
    int64 last                  = 5;
    int64 limit                 = 6;
-   bool count                 = 7;
+   bool count                  = 7;
 }
 
 //Response for List Datasource
@@ -93,4 +94,10 @@ message datasourceLogResponse {
 //Datasource Name 
 message datasourceName  {
    string name = 1;
+}
+
+//ScanMessage 
+message scanResponse {
+   string StatusCode  = 1;
+   string Message     = 2;
 }

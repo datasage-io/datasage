@@ -242,9 +242,9 @@ func (d *DatasourceServer) LogDatasource(ctx context.Context, in *ds.DatasourceL
 
 }
 
-func (d *DatasourceServer) Scan(ctx context.Context, in *ds.DatasourceName) (*ds.MessageResponse, error) {
+func (d *DatasourceServer) Scan(ctx context.Context, in *ds.DatasourceName) (*ds.ScanResponse, error) {
 	fmt.Println("Request for Scan - ", in)
-	return &ds.MessageResponse{Message: "Scan Completd"}, nil
+	return &ds.ScanResponse{StatusCode: "OK", Message: "Scan Completed"}, nil
 
 }
 
