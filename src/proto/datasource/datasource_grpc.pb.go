@@ -26,7 +26,7 @@ type DatasourceClient interface {
 	ListDatasource(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListResponse, error)
 	DeleteDatasource(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*MessageResponse, error)
 	LogDatasource(ctx context.Context, in *DatasourceLogRequest, opts ...grpc.CallOption) (*DatasourceLogResponse, error)
-	Scan(ctx context.Context, in *AddRequest, opts ...grpc.CallOption) (*MessageResponse, error)
+	Scan(ctx context.Context, in *DatasourceName, opts ...grpc.CallOption) (*MessageResponse, error)
 }
 
 type datasourceClient struct {
@@ -73,7 +73,7 @@ func (c *datasourceClient) LogDatasource(ctx context.Context, in *DatasourceLogR
 	return out, nil
 }
 
-func (c *datasourceClient) Scan(ctx context.Context, in *AddRequest, opts ...grpc.CallOption) (*MessageResponse, error) {
+func (c *datasourceClient) Scan(ctx context.Context, in *DatasourceName, opts ...grpc.CallOption) (*MessageResponse, error) {
 	out := new(MessageResponse)
 	err := c.cc.Invoke(ctx, "/datasource.Datasource/Scan", in, out, opts...)
 	if err != nil {
@@ -90,7 +90,7 @@ type DatasourceServer interface {
 	ListDatasource(context.Context, *ListRequest) (*ListResponse, error)
 	DeleteDatasource(context.Context, *DeleteRequest) (*MessageResponse, error)
 	LogDatasource(context.Context, *DatasourceLogRequest) (*DatasourceLogResponse, error)
-	Scan(context.Context, *AddRequest) (*MessageResponse, error)
+	Scan(context.Context, *DatasourceName) (*MessageResponse, error)
 	mustEmbedUnimplementedDatasourceServer()
 }
 
@@ -110,7 +110,7 @@ func (UnimplementedDatasourceServer) DeleteDatasource(context.Context, *DeleteRe
 func (UnimplementedDatasourceServer) LogDatasource(context.Context, *DatasourceLogRequest) (*DatasourceLogResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LogDatasource not implemented")
 }
-func (UnimplementedDatasourceServer) Scan(context.Context, *AddRequest) (*MessageResponse, error) {
+func (UnimplementedDatasourceServer) Scan(context.Context, *DatasourceName) (*MessageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Scan not implemented")
 }
 func (UnimplementedDatasourceServer) mustEmbedUnimplementedDatasourceServer() {}
@@ -199,7 +199,7 @@ func _Datasource_LogDatasource_Handler(srv interface{}, ctx context.Context, dec
 }
 
 func _Datasource_Scan_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AddRequest)
+	in := new(DatasourceName)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -211,7 +211,7 @@ func _Datasource_Scan_Handler(srv interface{}, ctx context.Context, dec func(int
 		FullMethod: "/datasource.Datasource/Scan",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DatasourceServer).Scan(ctx, req.(*AddRequest))
+		return srv.(DatasourceServer).Scan(ctx, req.(*DatasourceName))
 	}
 	return interceptor(ctx, in, info, handler)
 }
