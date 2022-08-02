@@ -27,6 +27,7 @@ type DatasourceClient interface {
 	DeleteDatasource(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*MessageResponse, error)
 	LogDatasource(ctx context.Context, in *DatasourceLogRequest, opts ...grpc.CallOption) (*DatasourceLogResponse, error)
 	Scan(ctx context.Context, in *DatasourceName, opts ...grpc.CallOption) (*MessageResponse, error)
+	ApplyRecommendedPolicy(ctx context.Context, in *RecommendedPolicy, opts ...grpc.CallOption) (*MessageResponse, error)
 }
 
 type datasourceClient struct {
@@ -82,6 +83,15 @@ func (c *datasourceClient) Scan(ctx context.Context, in *DatasourceName, opts ..
 	return out, nil
 }
 
+func (c *datasourceClient) ApplyRecommendedPolicy(ctx context.Context, in *RecommendedPolicy, opts ...grpc.CallOption) (*MessageResponse, error) {
+	out := new(MessageResponse)
+	err := c.cc.Invoke(ctx, "/datasource.Datasource/ApplyRecommendedPolicy", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DatasourceServer is the server API for Datasource service.
 // All implementations must embed UnimplementedDatasourceServer
 // for forward compatibility
@@ -91,6 +101,7 @@ type DatasourceServer interface {
 	DeleteDatasource(context.Context, *DeleteRequest) (*MessageResponse, error)
 	LogDatasource(context.Context, *DatasourceLogRequest) (*DatasourceLogResponse, error)
 	Scan(context.Context, *DatasourceName) (*MessageResponse, error)
+	ApplyRecommendedPolicy(context.Context, *RecommendedPolicy) (*MessageResponse, error)
 	mustEmbedUnimplementedDatasourceServer()
 }
 
@@ -112,6 +123,9 @@ func (UnimplementedDatasourceServer) LogDatasource(context.Context, *DatasourceL
 }
 func (UnimplementedDatasourceServer) Scan(context.Context, *DatasourceName) (*MessageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Scan not implemented")
+}
+func (UnimplementedDatasourceServer) ApplyRecommendedPolicy(context.Context, *RecommendedPolicy) (*MessageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ApplyRecommendedPolicy not implemented")
 }
 func (UnimplementedDatasourceServer) mustEmbedUnimplementedDatasourceServer() {}
 
@@ -216,6 +230,24 @@ func _Datasource_Scan_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Datasource_ApplyRecommendedPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RecommendedPolicy)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DatasourceServer).ApplyRecommendedPolicy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/datasource.Datasource/ApplyRecommendedPolicy",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DatasourceServer).ApplyRecommendedPolicy(ctx, req.(*RecommendedPolicy))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Datasource_ServiceDesc is the grpc.ServiceDesc for Datasource service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -242,6 +274,10 @@ var Datasource_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Scan",
 			Handler:    _Datasource_Scan_Handler,
+		},
+		{
+			MethodName: "ApplyRecommendedPolicy",
+			Handler:    _Datasource_ApplyRecommendedPolicy_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
