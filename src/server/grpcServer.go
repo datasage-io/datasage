@@ -248,7 +248,7 @@ func (d *DatasourceServer) Scan(ctx context.Context, in *ds.DatasourceName) (*ds
 
 }
 
-func (d *DatasourceServer) ApplyRecommendedPolicy(ctx context.Context, in *ds.RecommendedPolicy) (*ds.MessageResponse, error) {
+func (d *DatasourceServer) ApplyRecommendedPolicy(ctx context.Context, in *ds.PolicyIds) (*ds.MessageResponse, error) {
 	fmt.Println("Apply Recommended Policy Request - ", in)
 	return &ds.MessageResponse{StatusCode: "OK", Message: "Recommended Policy Applied"}, nil
 

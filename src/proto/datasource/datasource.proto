@@ -12,7 +12,7 @@ service Datasource {
    rpc DeleteDatasource ( deleteRequest ) returns (  messageResponse );
    rpc LogDatasource ( datasourceLogRequest ) returns (  datasourceLogResponse );
    rpc Scan ( datasourceName ) returns ( messageResponse );
-   rpc ApplyRecommendedPolicy ( recommendedPolicy ) returns (  messageResponse );
+   rpc ApplyPolicy ( policyIds ) returns (  messageResponse );
 }
 
 //Request for Create Datasource 
@@ -98,6 +98,6 @@ message datasourceName  {
 }
 
 //Recommended Policy 
-message recommendedPolicy {
-   int64 policyId = 1;
+message policyIds {
+   repeated int64 Id = 1;
 }
