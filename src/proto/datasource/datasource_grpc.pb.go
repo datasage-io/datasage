@@ -22,12 +22,12 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DatasourceClient interface {
-	AddDatasource(ctx context.Context, in *AddRequest, opts ...grpc.CallOption) (*MessageResponse, error)
+	AddDatasource(ctx context.Context, in *AddRequest, opts ...grpc.CallOption) (*AddResponse, error)
 	ListDatasource(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListResponse, error)
-	DeleteDatasource(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*MessageResponse, error)
-	LogDatasource(ctx context.Context, in *DatasourceLogRequest, opts ...grpc.CallOption) (*DatasourceLogResponse, error)
-	Scan(ctx context.Context, in *DatasourceName, opts ...grpc.CallOption) (*MessageResponse, error)
-	ApplyPolicy(ctx context.Context, in *PolicyIds, opts ...grpc.CallOption) (*MessageResponse, error)
+	DeleteDatasource(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
+	LogDatasource(ctx context.Context, in *LogRequest, opts ...grpc.CallOption) (*LogResponse, error)
+	Scan(ctx context.Context, in *ScanRequest, opts ...grpc.CallOption) (*ScanResponse, error)
+	ApplyPolicy(ctx context.Context, in *PolicyIdsRequest, opts ...grpc.CallOption) (*PolicyResponse, error)
 }
 
 type datasourceClient struct {
@@ -38,8 +38,8 @@ func NewDatasourceClient(cc grpc.ClientConnInterface) DatasourceClient {
 	return &datasourceClient{cc}
 }
 
-func (c *datasourceClient) AddDatasource(ctx context.Context, in *AddRequest, opts ...grpc.CallOption) (*MessageResponse, error) {
-	out := new(MessageResponse)
+func (c *datasourceClient) AddDatasource(ctx context.Context, in *AddRequest, opts ...grpc.CallOption) (*AddResponse, error) {
+	out := new(AddResponse)
 	err := c.cc.Invoke(ctx, "/datasource.Datasource/AddDatasource", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -56,8 +56,8 @@ func (c *datasourceClient) ListDatasource(ctx context.Context, in *ListRequest, 
 	return out, nil
 }
 
-func (c *datasourceClient) DeleteDatasource(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*MessageResponse, error) {
-	out := new(MessageResponse)
+func (c *datasourceClient) DeleteDatasource(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error) {
+	out := new(DeleteResponse)
 	err := c.cc.Invoke(ctx, "/datasource.Datasource/DeleteDatasource", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -65,8 +65,8 @@ func (c *datasourceClient) DeleteDatasource(ctx context.Context, in *DeleteReque
 	return out, nil
 }
 
-func (c *datasourceClient) LogDatasource(ctx context.Context, in *DatasourceLogRequest, opts ...grpc.CallOption) (*DatasourceLogResponse, error) {
-	out := new(DatasourceLogResponse)
+func (c *datasourceClient) LogDatasource(ctx context.Context, in *LogRequest, opts ...grpc.CallOption) (*LogResponse, error) {
+	out := new(LogResponse)
 	err := c.cc.Invoke(ctx, "/datasource.Datasource/LogDatasource", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -74,8 +74,8 @@ func (c *datasourceClient) LogDatasource(ctx context.Context, in *DatasourceLogR
 	return out, nil
 }
 
-func (c *datasourceClient) Scan(ctx context.Context, in *DatasourceName, opts ...grpc.CallOption) (*MessageResponse, error) {
-	out := new(MessageResponse)
+func (c *datasourceClient) Scan(ctx context.Context, in *ScanRequest, opts ...grpc.CallOption) (*ScanResponse, error) {
+	out := new(ScanResponse)
 	err := c.cc.Invoke(ctx, "/datasource.Datasource/Scan", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -83,8 +83,8 @@ func (c *datasourceClient) Scan(ctx context.Context, in *DatasourceName, opts ..
 	return out, nil
 }
 
-func (c *datasourceClient) ApplyPolicy(ctx context.Context, in *PolicyIds, opts ...grpc.CallOption) (*MessageResponse, error) {
-	out := new(MessageResponse)
+func (c *datasourceClient) ApplyPolicy(ctx context.Context, in *PolicyIdsRequest, opts ...grpc.CallOption) (*PolicyResponse, error) {
+	out := new(PolicyResponse)
 	err := c.cc.Invoke(ctx, "/datasource.Datasource/ApplyPolicy", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -96,12 +96,12 @@ func (c *datasourceClient) ApplyPolicy(ctx context.Context, in *PolicyIds, opts 
 // All implementations must embed UnimplementedDatasourceServer
 // for forward compatibility
 type DatasourceServer interface {
-	AddDatasource(context.Context, *AddRequest) (*MessageResponse, error)
+	AddDatasource(context.Context, *AddRequest) (*AddResponse, error)
 	ListDatasource(context.Context, *ListRequest) (*ListResponse, error)
-	DeleteDatasource(context.Context, *DeleteRequest) (*MessageResponse, error)
-	LogDatasource(context.Context, *DatasourceLogRequest) (*DatasourceLogResponse, error)
-	Scan(context.Context, *DatasourceName) (*MessageResponse, error)
-	ApplyPolicy(context.Context, *PolicyIds) (*MessageResponse, error)
+	DeleteDatasource(context.Context, *DeleteRequest) (*DeleteResponse, error)
+	LogDatasource(context.Context, *LogRequest) (*LogResponse, error)
+	Scan(context.Context, *ScanRequest) (*ScanResponse, error)
+	ApplyPolicy(context.Context, *PolicyIdsRequest) (*PolicyResponse, error)
 	mustEmbedUnimplementedDatasourceServer()
 }
 
@@ -109,22 +109,22 @@ type DatasourceServer interface {
 type UnimplementedDatasourceServer struct {
 }
 
-func (UnimplementedDatasourceServer) AddDatasource(context.Context, *AddRequest) (*MessageResponse, error) {
+func (UnimplementedDatasourceServer) AddDatasource(context.Context, *AddRequest) (*AddResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddDatasource not implemented")
 }
 func (UnimplementedDatasourceServer) ListDatasource(context.Context, *ListRequest) (*ListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListDatasource not implemented")
 }
-func (UnimplementedDatasourceServer) DeleteDatasource(context.Context, *DeleteRequest) (*MessageResponse, error) {
+func (UnimplementedDatasourceServer) DeleteDatasource(context.Context, *DeleteRequest) (*DeleteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteDatasource not implemented")
 }
-func (UnimplementedDatasourceServer) LogDatasource(context.Context, *DatasourceLogRequest) (*DatasourceLogResponse, error) {
+func (UnimplementedDatasourceServer) LogDatasource(context.Context, *LogRequest) (*LogResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LogDatasource not implemented")
 }
-func (UnimplementedDatasourceServer) Scan(context.Context, *DatasourceName) (*MessageResponse, error) {
+func (UnimplementedDatasourceServer) Scan(context.Context, *ScanRequest) (*ScanResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Scan not implemented")
 }
-func (UnimplementedDatasourceServer) ApplyPolicy(context.Context, *PolicyIds) (*MessageResponse, error) {
+func (UnimplementedDatasourceServer) ApplyPolicy(context.Context, *PolicyIdsRequest) (*PolicyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ApplyPolicy not implemented")
 }
 func (UnimplementedDatasourceServer) mustEmbedUnimplementedDatasourceServer() {}
@@ -195,7 +195,7 @@ func _Datasource_DeleteDatasource_Handler(srv interface{}, ctx context.Context, 
 }
 
 func _Datasource_LogDatasource_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DatasourceLogRequest)
+	in := new(LogRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -207,13 +207,13 @@ func _Datasource_LogDatasource_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: "/datasource.Datasource/LogDatasource",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DatasourceServer).LogDatasource(ctx, req.(*DatasourceLogRequest))
+		return srv.(DatasourceServer).LogDatasource(ctx, req.(*LogRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Datasource_Scan_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DatasourceName)
+	in := new(ScanRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -225,13 +225,13 @@ func _Datasource_Scan_Handler(srv interface{}, ctx context.Context, dec func(int
 		FullMethod: "/datasource.Datasource/Scan",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DatasourceServer).Scan(ctx, req.(*DatasourceName))
+		return srv.(DatasourceServer).Scan(ctx, req.(*ScanRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Datasource_ApplyPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PolicyIds)
+	in := new(PolicyIdsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -243,7 +243,7 @@ func _Datasource_ApplyPolicy_Handler(srv interface{}, ctx context.Context, dec f
 		FullMethod: "/datasource.Datasource/ApplyPolicy",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DatasourceServer).ApplyPolicy(ctx, req.(*PolicyIds))
+		return srv.(DatasourceServer).ApplyPolicy(ctx, req.(*PolicyIdsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
