@@ -259,9 +259,9 @@ func (d *DatasourceServer) Scan(ctx context.Context, in *ds.ScanRequest) (*ds.Sc
 	return &ds.ScanResponse{StatusCode: codes.OK.String(), Message: "Scan Completed"}, nil
 }
 
-func (d *DatasourceServer) ApplyRecommendedPolicy(ctx context.Context, in *ds.PolicyIdsRequest) (*ds.PolicyResponse, error) {
+func (d *DatasourceServer) ApplyPolicy(ctx context.Context, in *ds.ApplyPolicyRequest) (*ds.ApplyPolicyResponse, error) {
 	fmt.Println("Apply Recommended Policy Request - ", in)
-	return &ds.PolicyResponse{StatusCode: codes.OK.String(), Message: "Recommended Policy Applied"}, nil
+	return &ds.ApplyPolicyResponse{StatusCode: codes.OK.String(), Message: "Recommended Policy Applied"}, nil
 }
 
 // ================= //

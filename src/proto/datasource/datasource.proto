@@ -112,6 +112,7 @@ message scanResponse  {
 //applyPolicyRequest - Request for Recommended Policy 
 message applyPolicyRequest {
    repeated int64 Id = 1;
+   int64 dsId        = 2;
 }
 
 //applyPolicyResponse - Response for Recommended Policy 
