@@ -12,7 +12,7 @@ service Datasource {
    rpc DeleteDatasource ( deleteRequest ) returns (  deleteResponse );
    rpc LogDatasource ( logRequest ) returns (  logResponse );
    rpc Scan ( scanRequest ) returns ( scanResponse );
-   rpc ApplyPolicy ( policyIdsRequest ) returns (  policyResponse );
+   rpc ApplyPolicy ( applyPolicyRequest ) returns (  applyPolicyResponse );
 }
 
 //Request for Create Datasource 
@@ -109,13 +109,13 @@ message scanResponse  {
    string message     = 2;
 }
 
-//policyIdsRequest - Request for Recommended Policy 
-message policyIdsRequest {
+//applyPolicyRequest - Request for Recommended Policy 
+message applyPolicyRequest {
    repeated int64 Id = 1;
 }
 
-//policyIdsResponse - Response for Recommended Policy 
-message policyResponse {
+//applyPolicyResponse - Response for Recommended Policy 
+message applyPolicyResponse {
    string statusCode  = 1;
    string message     = 2;
 }

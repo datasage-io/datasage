@@ -27,7 +27,7 @@ type DatasourceClient interface {
 	DeleteDatasource(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
 	LogDatasource(ctx context.Context, in *LogRequest, opts ...grpc.CallOption) (*LogResponse, error)
 	Scan(ctx context.Context, in *ScanRequest, opts ...grpc.CallOption) (*ScanResponse, error)
-	ApplyPolicy(ctx context.Context, in *PolicyIdsRequest, opts ...grpc.CallOption) (*PolicyResponse, error)
+	ApplyPolicy(ctx context.Context, in *ApplyPolicyRequest, opts ...grpc.CallOption) (*ApplyPolicyResponse, error)
 }
 
 type datasourceClient struct {
@@ -83,8 +83,8 @@ func (c *datasourceClient) Scan(ctx context.Context, in *ScanRequest, opts ...gr
 	return out, nil
 }
 
-func (c *datasourceClient) ApplyPolicy(ctx context.Context, in *PolicyIdsRequest, opts ...grpc.CallOption) (*PolicyResponse, error) {
-	out := new(PolicyResponse)
+func (c *datasourceClient) ApplyPolicy(ctx context.Context, in *ApplyPolicyRequest, opts ...grpc.CallOption) (*ApplyPolicyResponse, error) {
+	out := new(ApplyPolicyResponse)
 	err := c.cc.Invoke(ctx, "/datasource.Datasource/ApplyPolicy", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -101,7 +101,7 @@ type DatasourceServer interface {
 	DeleteDatasource(context.Context, *DeleteRequest) (*DeleteResponse, error)
 	LogDatasource(context.Context, *LogRequest) (*LogResponse, error)
 	Scan(context.Context, *ScanRequest) (*ScanResponse, error)
-	ApplyPolicy(context.Context, *PolicyIdsRequest) (*PolicyResponse, error)
+	ApplyPolicy(context.Context, *ApplyPolicyRequest) (*ApplyPolicyResponse, error)
 	mustEmbedUnimplementedDatasourceServer()
 }
 
@@ -124,7 +124,7 @@ func (UnimplementedDatasourceServer) LogDatasource(context.Context, *LogRequest)
 func (UnimplementedDatasourceServer) Scan(context.Context, *ScanRequest) (*ScanResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Scan not implemented")
 }
-func (UnimplementedDatasourceServer) ApplyPolicy(context.Context, *PolicyIdsRequest) (*PolicyResponse, error) {
+func (UnimplementedDatasourceServer) ApplyPolicy(context.Context, *ApplyPolicyRequest) (*ApplyPolicyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ApplyPolicy not implemented")
 }
 func (UnimplementedDatasourceServer) mustEmbedUnimplementedDatasourceServer() {}
@@ -231,7 +231,7 @@ func _Datasource_Scan_Handler(srv interface{}, ctx context.Context, dec func(int
 }
 
 func _Datasource_ApplyPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PolicyIdsRequest)
+	in := new(ApplyPolicyRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -243,7 +243,7 @@ func _Datasource_ApplyPolicy_Handler(srv interface{}, ctx context.Context, dec f
 		FullMethod: "/datasource.Datasource/ApplyPolicy",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DatasourceServer).ApplyPolicy(ctx, req.(*PolicyIdsRequest))
+		return srv.(DatasourceServer).ApplyPolicy(ctx, req.(*ApplyPolicyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
