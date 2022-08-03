@@ -16,8 +16,10 @@ import (
 	"github.com/google/uuid"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
+	"google.golang.org/grpc/status"
 )
 
 const PortNumber = "8089"
@@ -25,9 +27,9 @@ const PortNumber = "8089"
 var log *zerolog.Logger = logger.GetInstance()
 var wg sync.WaitGroup
 
-// ======================= //
-// == Datasource Service == //
-// ===================== //
+// ======================================== //
+// == RPC Server ( Datasource Class Tag) == //
+// ======================================= //
 
 type DatasourceServer struct {
 	ds.UnimplementedDatasourceServer
@@ -40,6 +42,10 @@ type TagServer struct {
 type ClassServer struct {
 	classpb.UnimplementedClassServer
 }
+
+// ====================//
+// == Class Service == //
+// =================== //
 
 func (d *ClassServer) AddClass(ctx context.Context, in *classpb.CreateRequest) (*classpb.MessageResponse, error) {
 	fmt.Println("AddClass : ", in)
@@ -93,6 +99,9 @@ func (d *ClassServer) DeleteClass(ctx context.Context, in *classpb.DeleteRequest
 	return nil, nil
 }
 
+// ====================//
+// == Tag   Service == //
+// =================== //
 func (d *TagServer) AddTag(ctx context.Context, in *tagpb.AddRequest) (*tagpb.MessageResponse, error) {
 	log.Debug().Msgf("AddTag %v", in)
 
@@ -152,7 +161,11 @@ func (d *TagServer) DeleteTag(ctx context.Context, in *tagpb.DeleteRequest) (*ta
 
 }
 
-func (d *DatasourceServer) AddDatasource(ctx context.Context, in *ds.AddRequest) (*ds.MessageResponse, error) {
+// ====================//
+// == Datasource Service == //
+// =================== //
+
+func (d *DatasourceServer) AddDatasource(ctx context.Context, in *ds.AddRequest) (*ds.AddResponse, error) {
 	fmt.Println("Add Datasource Request --- ", in)
 	st, err := storage.GetStorageInstance()
 	if err != nil {
@@ -175,9 +188,9 @@ func (d *DatasourceServer) AddDatasource(ctx context.Context, in *ds.AddRequest)
 
 	err = st.AddDataSource(storageDpDataSourceObj)
 	if err != nil {
-		return &ds.MessageResponse{Message: ""}, err
+		return &ds.AddResponse{StatusCode: codes.Internal.String(), Message: ""}, status.Error(codes.Internal, "Internal Error")
 	}
-	return &ds.MessageResponse{StatusCode: "OK", Message: "Data Source added for Scaning"}, nil
+	return &ds.AddResponse{StatusCode: codes.OK.String(), Message: "Data Source added for Scaning"}, nil
 }
 func (d *DatasourceServer) ListDatasource(ctx context.Context, in *ds.ListRequest) (*ds.ListResponse, error) {
 	fmt.Println("List Datasource Request ", in)
@@ -208,7 +221,7 @@ func (d *DatasourceServer) ListDatasource(ctx context.Context, in *ds.ListReques
 	}
 	return &ds.ListResponse{ListAllDatasources: datasourcesOut, Count: int64(len(datasourcesOut))}, nil
 }
-func (d *DatasourceServer) DeleteDatasource(ctx context.Context, in *ds.DeleteRequest) (*ds.MessageResponse, error) {
+func (d *DatasourceServer) DeleteDatasource(ctx context.Context, in *ds.DeleteRequest) (*ds.DeleteResponse, error) {
 	fmt.Println("Delete Datasource Request --- ", in)
 	st, err := storage.GetStorageInstance()
 	if err != nil {
@@ -221,7 +234,7 @@ func (d *DatasourceServer) DeleteDatasource(ctx context.Context, in *ds.DeleteRe
 		element := arrayIds[i]
 		id, err := strconv.ParseInt(element, 10, 64)
 		if err != nil {
-			return &ds.MessageResponse{Message: "incorrect input"}, nil
+			return &ds.DeleteResponse{StatusCode: codes.InvalidArgument.String(), Message: "incorrect input"}, status.Error(codes.InvalidArgument, "incorrect input")
 		}
 		ids = append(ids, id)
 	}
@@ -231,21 +244,24 @@ func (d *DatasourceServer) DeleteDatasource(ctx context.Context, in *ds.DeleteRe
 		log.Error().Err(err).Msg("Internal Error")
 	}
 	if statusDelete {
-		return &ds.MessageResponse{Message: "Delete sucessful"}, nil
+		return &ds.DeleteResponse{StatusCode: codes.OK.String(), Message: "Delete sucessful"}, nil
 	}
-	return &ds.MessageResponse{Message: "Delete failed"}, nil
+	return &ds.DeleteResponse{StatusCode: codes.Unknown.String(), Message: "Delete failed"}, status.Error(codes.Unknown, "Delete failed")
 }
 
-func (d *DatasourceServer) LogDatasource(ctx context.Context, in *ds.DatasourceLogRequest) (*ds.DatasourceLogResponse, error) {
-
+func (d *DatasourceServer) LogDatasource(ctx context.Context, in *ds.LogRequest) (*ds.LogResponse, error) {
+	fmt.Println("Request for log -- ", in)
 	return nil, nil
-
 }
 
-func (d *DatasourceServer) Scan(ctx context.Context, in *ds.DatasourceName) (*ds.MessageResponse, error) {
+func (d *DatasourceServer) Scan(ctx context.Context, in *ds.ScanRequest) (*ds.ScanResponse, error) {
 	fmt.Println("Request for Scan - ", in)
-	return &ds.MessageResponse{StatusCode: "OK", Message: "Scan Completed"}, nil
+	return &ds.ScanResponse{StatusCode: codes.OK.String(), Message: "Scan Completed"}, nil
+}
 
+func (d *DatasourceServer) ApplyRecommendedPolicy(ctx context.Context, in *ds.PolicyIdsRequest) (*ds.PolicyResponse, error) {
+	fmt.Println("Apply Recommended Policy Request - ", in)
+	return &ds.PolicyResponse{StatusCode: codes.OK.String(), Message: "Recommended Policy Applied"}, nil
 }
 
 // ================= //

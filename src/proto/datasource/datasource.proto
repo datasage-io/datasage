@@ -7,11 +7,12 @@ option go_package = "github.com/datasage-io/datasage/proto/datasource";
 
 //RPC Service 
 service Datasource {
-   rpc AddDatasource ( addRequest ) returns (  messageResponse );
+   rpc AddDatasource ( addRequest ) returns (  addResponse );
    rpc ListDatasource ( listRequest ) returns (  listResponse );
-   rpc DeleteDatasource ( deleteRequest ) returns (  messageResponse );
-   rpc LogDatasource ( datasourceLogRequest ) returns (  datasourceLogResponse );
-   rpc Scan ( datasourceName ) returns ( messageResponse );
+   rpc DeleteDatasource ( deleteRequest ) returns (  deleteResponse );
+   rpc LogDatasource ( logRequest ) returns (  logResponse );
+   rpc Scan ( scanRequest ) returns ( scanResponse );
+   rpc ApplyPolicy ( applyPolicyRequest ) returns (  applyPolicyResponse );
 }
 
 //Request for Create Datasource 
@@ -25,10 +26,15 @@ message addRequest {
    string     port         = 8;
    string     user         = 9;
    string     password     = 10;
-   int64      policy_Id     = 11;
 }
 
-//Request for List Datasource
+//addResponse - Response for add datasource 
+message addResponse {
+   string statusCode  = 1;
+   string message     = 2;
+}
+
+//listRequest - Request for List Datasource
 message listRequest {
    string name                 = 1;
    repeated string data_domain = 2;
@@ -37,24 +43,6 @@ message listRequest {
    int64 last                  = 5;
    int64 limit                 = 6;
    bool count                  = 7;
-}
-
-//Response for List Datasource
-message listResponse {
-   repeated ListAll list_all_datasources = 1;
-   int64 count = 2;
-}
-
-//Request for Delete Datasource
-message deleteRequest {
-   repeated string id = 1;
-   bool isDeleteAll   = 2;
-}
-
-//Response for  Datasource
-message messageResponse {
-   string statusCode  = 1;
-   string message     = 2;
 }
 
 message ListAll {
@@ -68,8 +56,26 @@ message ListAll {
    string    created_at   = 8;
 }
 
-//Request for datasource log
-message datasourceLogRequest {
+//listResponse - Response for List Datasource
+message listResponse {
+   repeated ListAll list_all_datasources = 1;
+   int64 count = 2;
+}
+
+//deleteRequest - Request for Delete Datasource
+message deleteRequest {
+   repeated string id = 1;
+   bool isDeleteAll   = 2;
+}
+
+//deleteResponse - Response for delete datasource 
+message deleteResponse {
+   string statusCode  = 1;
+   string message     = 2;
+}
+
+//logRequest - Request for datasource log
+message logRequest {
    string datasource       = 1;
    string database         = 2;
    string table            = 3;
@@ -87,12 +93,29 @@ message datasourceLogResponseStruct {
    string lastScanTime      = 7; 
 }
 
-//log Response 
-message datasourceLogResponse {
+//logResponse - Response for log datasource
+message logResponse {
    repeated datasourceLogResponseStruct datasourceLog = 1;
 }
 
-//Datasource Name 
-message datasourceName  {
+//scanRequest - Request for scan datasource
+message scanRequest  {
    string name = 1;
+}
+
+//scanResponse - Response for scan datasource
+message scanResponse  {
+   string statusCode  = 1;
+   string message     = 2;
+}
+
+//applyPolicyRequest - Request for Recommended Policy 
+message applyPolicyRequest {
+   repeated int64 Id = 1;
+}
+
+//applyPolicyResponse - Response for Recommended Policy 
+message applyPolicyResponse {
+   string statusCode  = 1;
+   string message     = 2;
 }
