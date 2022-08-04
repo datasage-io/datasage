@@ -8,6 +8,8 @@ import (
 	"sync"
 
 	logger "github.com/datasage-io/datasage/src/logger"
+	"github.com/datasage-io/datasage/src/utils/constants"
+	"github.com/golang/protobuf/ptypes/empty"
 
 	classpb "github.com/datasage-io/datasage/src/proto/class"
 	ds "github.com/datasage-io/datasage/src/proto/datasource"
@@ -257,6 +259,18 @@ func (d *DatasourceServer) LogDatasource(ctx context.Context, in *ds.LogRequest)
 func (d *DatasourceServer) Scan(ctx context.Context, in *ds.ScanRequest) (*ds.ScanResponse, error) {
 	fmt.Println("Request for Scan - ", in)
 	return &ds.ScanResponse{StatusCode: codes.OK.String(), Message: "Scan Completed"}, nil
+}
+
+func (d *DatasourceServer) GetStatus(ctx context.Context, in *ds.StatusRequest) (*ds.StatusResponse, error) {
+	fmt.Println("Request for Status - Datasource Name - ", in)
+	return &ds.StatusResponse{StatusCode: codes.OK.String(), DsStatus: constants.DataSourceInitialScanCompleted}, nil
+}
+
+func (d *DatasourceServer) GetRecommendedPolicy(ctx context.Context, in *empty.Empty) (*ds.RecommendedpolicyResponse, error) {
+	fmt.Println("GetRecommendedPolicy - ", in)
+	//RecommendedPolicy
+	var recommedPolicy = []string{"GDPR Audit", "PII Audit", "SOC 2 Audit", "HIPAA Audit", "UDI Audit"}
+	return &ds.RecommendedpolicyResponse{StatusCode: codes.OK.String(), PolicyName: recommedPolicy}, nil
 }
 
 func (d *DatasourceServer) ApplyPolicy(ctx context.Context, in *ds.ApplyPolicyRequest) (*ds.ApplyPolicyResponse, error) {

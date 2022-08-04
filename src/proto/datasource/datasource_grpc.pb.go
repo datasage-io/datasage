@@ -8,6 +8,7 @@ package datasource
 
 import (
 	context "context"
+	empty "github.com/golang/protobuf/ptypes/empty"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -27,6 +28,8 @@ type DatasourceClient interface {
 	DeleteDatasource(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
 	LogDatasource(ctx context.Context, in *LogRequest, opts ...grpc.CallOption) (*LogResponse, error)
 	Scan(ctx context.Context, in *ScanRequest, opts ...grpc.CallOption) (*ScanResponse, error)
+	GetStatus(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusResponse, error)
+	GetRecommendedPolicy(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*RecommendedpolicyResponse, error)
 	ApplyPolicy(ctx context.Context, in *ApplyPolicyRequest, opts ...grpc.CallOption) (*ApplyPolicyResponse, error)
 }
 
@@ -83,6 +86,24 @@ func (c *datasourceClient) Scan(ctx context.Context, in *ScanRequest, opts ...gr
 	return out, nil
 }
 
+func (c *datasourceClient) GetStatus(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusResponse, error) {
+	out := new(StatusResponse)
+	err := c.cc.Invoke(ctx, "/datasource.Datasource/GetStatus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *datasourceClient) GetRecommendedPolicy(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*RecommendedpolicyResponse, error) {
+	out := new(RecommendedpolicyResponse)
+	err := c.cc.Invoke(ctx, "/datasource.Datasource/GetRecommendedPolicy", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *datasourceClient) ApplyPolicy(ctx context.Context, in *ApplyPolicyRequest, opts ...grpc.CallOption) (*ApplyPolicyResponse, error) {
 	out := new(ApplyPolicyResponse)
 	err := c.cc.Invoke(ctx, "/datasource.Datasource/ApplyPolicy", in, out, opts...)
@@ -101,6 +122,8 @@ type DatasourceServer interface {
 	DeleteDatasource(context.Context, *DeleteRequest) (*DeleteResponse, error)
 	LogDatasource(context.Context, *LogRequest) (*LogResponse, error)
 	Scan(context.Context, *ScanRequest) (*ScanResponse, error)
+	GetStatus(context.Context, *StatusRequest) (*StatusResponse, error)
+	GetRecommendedPolicy(context.Context, *empty.Empty) (*RecommendedpolicyResponse, error)
 	ApplyPolicy(context.Context, *ApplyPolicyRequest) (*ApplyPolicyResponse, error)
 	mustEmbedUnimplementedDatasourceServer()
 }
@@ -123,6 +146,12 @@ func (UnimplementedDatasourceServer) LogDatasource(context.Context, *LogRequest)
 }
 func (UnimplementedDatasourceServer) Scan(context.Context, *ScanRequest) (*ScanResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Scan not implemented")
+}
+func (UnimplementedDatasourceServer) GetStatus(context.Context, *StatusRequest) (*StatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetStatus not implemented")
+}
+func (UnimplementedDatasourceServer) GetRecommendedPolicy(context.Context, *empty.Empty) (*RecommendedpolicyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRecommendedPolicy not implemented")
 }
 func (UnimplementedDatasourceServer) ApplyPolicy(context.Context, *ApplyPolicyRequest) (*ApplyPolicyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ApplyPolicy not implemented")
@@ -230,6 +259,42 @@ func _Datasource_Scan_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Datasource_GetStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DatasourceServer).GetStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/datasource.Datasource/GetStatus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DatasourceServer).GetStatus(ctx, req.(*StatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Datasource_GetRecommendedPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(empty.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DatasourceServer).GetRecommendedPolicy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/datasource.Datasource/GetRecommendedPolicy",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DatasourceServer).GetRecommendedPolicy(ctx, req.(*empty.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Datasource_ApplyPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ApplyPolicyRequest)
 	if err := dec(in); err != nil {
@@ -274,6 +339,14 @@ var Datasource_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Scan",
 			Handler:    _Datasource_Scan_Handler,
+		},
+		{
+			MethodName: "GetStatus",
+			Handler:    _Datasource_GetStatus_Handler,
+		},
+		{
+			MethodName: "GetRecommendedPolicy",
+			Handler:    _Datasource_GetRecommendedPolicy_Handler,
 		},
 		{
 			MethodName: "ApplyPolicy",
