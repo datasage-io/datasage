@@ -3,6 +3,8 @@ syntax = "proto3";
 package datasource;
  
 option go_package = "github.com/datasage-io/datasage/proto/datasource";
+
+import "google/protobuf/empty.proto";
  
 
 //RPC Service 
@@ -12,6 +14,8 @@ service Datasource {
    rpc DeleteDatasource ( deleteRequest ) returns (  deleteResponse );
    rpc LogDatasource ( logRequest ) returns (  logResponse );
    rpc Scan ( scanRequest ) returns ( scanResponse );
+   rpc GetStatus ( statusRequest ) returns ( statusResponse );
+   rpc GetRecommendedPolicy ( google.protobuf.Empty ) returns ( recommendedpolicyResponse );
    rpc ApplyPolicy ( applyPolicyRequest ) returns (  applyPolicyResponse );
 }
 
@@ -119,4 +123,21 @@ message applyPolicyRequest {
 message applyPolicyResponse {
    string statusCode  = 1;
    string message     = 2;
+}
+
+//statusRequest - Request to get status 
+message statusRequest {
+   string dsName  = 1;
+}
+
+//statusResponse - Response for the status
+message statusResponse {
+   string statusCode  = 1;
+   string dsStatus    = 2;
+}
+
+//recommendedpolicyResponse - Response for the Recommended Policy 
+message recommendedpolicyResponse {
+   string statusCode          = 1;
+   repeated string policyName = 2;
 }
