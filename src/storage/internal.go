@@ -260,9 +260,7 @@ var (
 )
 
 func getInternalStorageInstance(dsn string) (InternalStorage, error) {
-	once.Do(func() {
-		instance, _ = NewInternalStorage(dsn)
-	})
+	instance, _ = NewInternalStorage(dsn)
 	return instance, nil
 }
 func NewInternalStorage(dsn string) (InternalStorage, error) {
