@@ -98,7 +98,29 @@ func (d *ClassServer) ListClass(ctx context.Context, in *classpb.ListRequest) (*
 }
 func (d *ClassServer) DeleteClass(ctx context.Context, in *classpb.DeleteRequest) (*classpb.MessageResponse, error) {
 	fmt.Println("DeleteClass : ", in)
-	return nil, nil
+	st, err := storage.GetStorageInstance()
+	if err != nil {
+		log.Error().Err(err).Msg("Internal Error")
+	}
+	var ids []int64
+	arrayIds := in.GetId()
+	for i := range arrayIds {
+		element := arrayIds[i]
+		id, err := strconv.ParseInt(element, 10, 64)
+		if err != nil {
+			return &classpb.MessageResponse{Message: "incorrect input"}, nil
+		}
+		ids = append(ids, id)
+	}
+	statusDelete, err := st.DeleteClasses(ids)
+	if err != nil {
+		log.Error().Err(err).Msg("Internal Error")
+	}
+	if statusDelete == true {
+		return &classpb.MessageResponse{Message: "Delete sucessful"}, nil
+	}
+	return &classpb.MessageResponse{Message: "Delete failed"}, nil
+
 }
 
 // ====================//
@@ -159,9 +181,32 @@ func (d *TagServer) ListTag(ctx context.Context, in *tagpb.ListRequest) (*tagpb.
 }
 func (d *TagServer) DeleteTag(ctx context.Context, in *tagpb.DeleteRequest) (*tagpb.MessageResponse, error) {
 	log.Debug().Msgf("DeleteTag %v", in)
-	return nil, nil
+	st, err := storage.GetStorageInstance()
+	if err != nil {
+		log.Error().Err(err).Msg("Internal Error")
+	}
+	var ids []int64
+	arrayIds := in.GetId()
+	for i := range arrayIds {
+		element := arrayIds[i]
+		id, err := strconv.ParseInt(element, 10, 64)
+		if err != nil {
+			return &tagpb.MessageResponse{Message: "incorrect input"}, nil
+		}
+		ids = append(ids, id)
+	}
+	statusDelete, err := st.DeleteTags(ids)
+	if err != nil {
+		log.Error().Err(err).Msg("Internal Error")
+	}
+	if statusDelete == true {
+		return &tagpb.MessageResponse{Message: "Delete sucessful"}, nil
+	}
+	return &tagpb.MessageResponse{Message: "Delete failed"}, nil
 
 }
+
+
 
 // ====================//
 // == Datasource Service == //

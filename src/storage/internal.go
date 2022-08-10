@@ -2,6 +2,7 @@ package storage
 
 import (
 	"database/sql"
+	"fmt"
 	"os"
 	"strconv"
 	"sync"
@@ -409,4 +410,48 @@ func (insto InternalStorage) GetAssociatedClasses(rule string) ([]Class, error) 
 	}
 	rows.Close()
 	return classes, err
+}
+func (into InternalStorage) DeleteClasses(ids []int64) (bool, error) {
+	log.Trace().Msgf("InternalStorage DeleteClasses %v", ids)
+
+	for _, classid := range ids {
+		if res, err := into.SqliteConnc.Exec("DELETE FROM class where ID=$1", classid); err == nil {
+			if err != nil {
+				return false, err
+			}
+			count, err := res.RowsAffected()
+			log.Debug().Msgf("Deleteclasses count is %v", count)
+			if count == 0 {
+				return false, err
+			}
+		} else {
+			log.Error().Err(err).Msg("Deleteclasses")
+			return false, err
+		}
+	}
+	return true, nil
+}
+func (into InternalStorage) DeleteTags(ids []int64) (bool, error) {
+	log.Trace().Msgf("InternalStorage DeleteTags %v", ids)
+
+	for _, tagsid := range ids {
+		if res, err := into.SqliteConnc.Exec("DELETE FROM Tag where ID=$1", tagsid); err == nil {
+			fmt.Println(res)
+			if err != nil {
+				return false, err
+			}
+
+			count, err := res.RowsAffected()
+			log.Debug().Msgf("DeleteTags count is %v", count)
+			if count == 0 {
+				fmt.Println("delete failed ", tagsid)
+				return false, err
+			}
+		} else {
+			log.Error().Err(err).Msg("DeleteTags")
+			return false, err
+		}
+	}
+	return true, nil
+
 }

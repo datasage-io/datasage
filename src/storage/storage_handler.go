@@ -92,6 +92,10 @@ type Storage interface {
 	AddDataSource(DpDataSource) error
 	GetDataSources() ([]DpDataSource, error)
 	DeleteDataSources(ids []int64) (bool, error)
+	DeleteClasses(ids []int64) (bool, error)
+	DeleteTags(ids []int64) (bool, error)
+
+
 }
 
 type DpDataSource struct {
