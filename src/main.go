@@ -19,7 +19,7 @@ var configFilePath *string
 var log = logger.GetInstance()
 
 func main() {
-	configFilePath = flag.String("config-path", "conf/", "conf/")
+	configFilePath = flag.String("config-path", "/etc/datasage/conf/", "conf/")
 	flag.Parse()
 
 	log.Debug().Msgf("config path is  %v \n", *configFilePath)
