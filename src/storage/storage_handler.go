@@ -57,6 +57,33 @@ CREATE TABLE IF NOT EXISTS "dp_databases" (
 	"User" TEXT NOT NULL,
 	"Password" TEXT NOT NULL
   ) ;
+
+  CREATE TABLE IF NOT EXISTS  "ds_statusenum" (
+	"status_id" INTEGER PRIMARY KEY UNIQUE,
+	"status_value" TEXT NOT NULL
+  );
+
+
+INSERT INTO ds_statusenum ("status_id","status_value") VALUES (1,"DataSourceAddedSucessful");
+INSERT INTO ds_statusenum ("status_id","status_value") VALUES (2,"DataSourceAddFailed");
+INSERT INTO ds_statusenum ("status_id","status_value") VALUES (3,"DataSourceInitialScanFailed");
+INSERT INTO ds_statusenum ("status_id","status_value") VALUES (4,"DataSourceInitialScanCompleted");
+INSERT INTO ds_statusenum ("status_id","status_value") VALUES (5,"DataSourcePeriodicScanFailed");
+INSERT INTO ds_statusenum ("status_id","status_value") VALUES (6,"DataSourcePeriodicScanCompleted");
+INSERT INTO ds_statusenum ("status_id","status_value") VALUES (7,"DefaultPoliciesIdentificationFailed");
+INSERT INTO ds_statusenum ("status_id","status_value") VALUES (8,"DefaultPoliciesIdentified");
+INSERT INTO ds_statusenum ("status_id","status_value") VALUES (9,"PolicyEnforcementCompleted");
+INSERT INTO ds_statusenum ("status_id","status_value") VALUES (10,"PolicyEnforcementFailed");
+
+CREATE TABLE IF NOT EXISTS  "ds_scanstatus" (
+	"ds_id" INTEGER  PRIMARY KEY ,
+	"status_id" INTEGER,
+	FOREIGN KEY (ds_id) REFERENCES DpDataSource(id),
+	FOREIGN KEY (status_id) REFERENCES ds_statusenum(status_id)
+	  
+  );
+
+  
   CREATE UNIQUE INDEX index_databases ON dp_databases(name,type,dskey);
   CREATE UNIQUE INDEX index_tables ON dp_db_tables(dp_db_id,name);
   CREATE UNIQUE INDEX index_columns ON dp_db_columns(dp_db_id,dp_db_table_id,column_name);
@@ -75,23 +102,50 @@ type Tag struct {
 	Rule        string `csv:"rule"`
 	Description string `csv:"description"`
 }
+type CScan struct {
+	DsName    string `json:"dsName"`
+	DbName    string `json:"dbName"`
+	TableName string `json:"tableName"`
+	Columns   string `json:"columns"`
+	Classes   string `json:"classes"`
+	Tags      string `json:"tags"`
+}
+
 type StorageConfig struct {
 	Type string
 	Path string
 }
+
+type RecommendedPolicy struct {
+	PolicyId   int32
+	PolicyName string
+}
+
 type Storage interface {
 	GetClasses() ([]Class, error)
 	AddClass(string, string, string) error
+	DeleteClasses(ids []int64) (bool, error)
+
 	GetTags() ([]Tag, error)
 	AddTag(string, string, []string) error
+	DeleteTags(ids []int64) (bool, error)
 
 	GetAssociatedTags(string) ([]Tag, error)
 	GetAssociatedClasses(string) ([]Class, error)
 	SetSchemaData(DpDbDatabase) error
 
-	AddDataSource(DpDataSource) error
+	AddDataSource(DpDataSource) (int64, error)
 	GetDataSources() ([]DpDataSource, error)
 	DeleteDataSources(ids []int64) (bool, error)
+	Scan(dsname string) error
+	GetStatus(dsname string) (string, error)
+	GetRecommendedPolicy(dsname string) ([]RecommendedPolicy, error)
+	ApplyPolicy(dsname string, ids []int64) error
+	GetDataSource(dsname string) (DpDataSource, error)
+
+	GetScanLog(ds string, db string, table string, columns []string) ([]CScan, error)
+
+	UpdateDSStatus(dsid int64, statusid int64) error
 }
 
 type DpDataSource struct {
