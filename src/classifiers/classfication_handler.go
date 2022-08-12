@@ -8,6 +8,7 @@ import (
 
 	"github.com/datasage-io/datasage/src/adaptors"
 	"github.com/datasage-io/datasage/src/storage"
+	"github.com/datasage-io/datasage/src/utils/constants"
 
 	logger "github.com/datasage-io/datasage/src/logger"
 	"github.com/rs/zerolog"
@@ -175,6 +176,8 @@ func ScanDataSource(datasource storage.DpDataSource) error {
 
 	}
 	log.Trace().Msgf("scan completed for datasource: %v", datasource)
+
+	st.UpdateDSStatus(int64(datasource.ID), constants.DataSourceInitialScanCompleted)
 	return nil
 }
 
