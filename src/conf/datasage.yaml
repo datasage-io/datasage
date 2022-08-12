@@ -17,12 +17,12 @@ database:
     port: 1234
 storage:
   type: internal
-  #Path: ./datasage.db
-  Path: /etc/datasage/resources/datasage.db
-  #default_tags: ./storage/default/tags.csv
-  #default_classes: ./storage/default/class.csv
-  default_tags: /etc/datasage/resources/tags.csv
-  default_classes:  /etc/datasage/resources/class.csv
+  Path: ./datasage.db
+  #Path: /etc/datasage/resources/datasage.db
+  default_tags: ./storage/default/tags.csv
+  default_classes: ./storage/default/class.csv
+  #default_tags: /etc/datasage/resources/tags.csv
+  #default_classes:  /etc/datasage/resources/class.csv
  
 
 

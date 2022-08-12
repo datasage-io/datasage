@@ -18,7 +18,7 @@ func StreamLogToKafka(Log string, kafkaConfigs []KafkaLogConfig) error {
 		}
 		defer producer.Close()
 		if producer.Produce(&kafka.Message{
-			TopicPartition: kafka.TopicPartition{Topic: &config.Topic, Partition: kafka.PartitionAny},
+			TopicPartition: kafka.TopicPartition{Topic: &config.Topic, Partition: int32(kafka.PartitionAny)},
 			Value:          []byte(Log),
 		}, nil) != nil {
 			log.Printf("err: %s", err)
