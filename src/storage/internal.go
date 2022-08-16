@@ -418,9 +418,12 @@ func (insto InternalStorage) AddClass(description string, rule string, class str
 
 func (into InternalStorage) DeleteClasses(ids []int64) (bool, error) {
 	log.Trace().Msgf("InternalStorage DeleteClasses %v", ids)
+	distictids := removeDuplicateValues(ids)
+	fmt.Println(distictids)
 
 	for _, classid := range ids {
 		if res, err := into.SqliteConnc.Exec("DELETE FROM class where ID=$1", classid); err == nil {
+			fmt.Println(res)
 			if err != nil {
 				return false, err
 			}
@@ -439,8 +442,9 @@ func (into InternalStorage) DeleteClasses(ids []int64) (bool, error) {
 
 func (into InternalStorage) DeleteTags(ids []int64) (bool, error) {
 	log.Trace().Msgf("InternalStorage DeleteTags %v", ids)
-
-	for _, tagsid := range ids {
+	distictids := removeDuplicateValues(ids)
+	fmt.Println(distictids)
+	for _, tagsid := range distictids {
 		if res, err := into.SqliteConnc.Exec("DELETE FROM Tag where ID=$1", tagsid); err == nil {
 			fmt.Println(res)
 			if err != nil {
@@ -460,6 +464,23 @@ func (into InternalStorage) DeleteTags(ids []int64) (bool, error) {
 	}
 	return true, nil
 
+}
+
+//Remove Duplicate Keys
+func removeDuplicateValues(intSlice []int64) []int64 {
+	keys := make(map[int64]bool)
+	list := []int64{}
+
+	// If the key(values of the slice) is not equal
+	// to the already present value in new slice (list)
+	// then we append it. else we jump on another element.
+	for _, entry := range intSlice {
+		if _, value := keys[entry]; !value {
+			keys[entry] = true
+			list = append(list, entry)
+		}
+	}
+	return list
 }
 
 func (insto InternalStorage) GetTags() ([]Tag, error) {
