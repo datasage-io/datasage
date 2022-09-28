@@ -114,7 +114,7 @@ message scanResponse  {
 
 //applyPolicyRequest - Request for Recommended Policy 
 message applyPolicyRequest {
-   repeated string Id = 1;
+   repeated int64 Id  = 1;
    string dsName      = 2;
 }
 
