@@ -13,6 +13,7 @@ import (
 	"github.com/datasage-io/datasage/src/classifiers"
 	classpb "github.com/datasage-io/datasage/src/proto/class"
 	ds "github.com/datasage-io/datasage/src/proto/datasource"
+	policy "github.com/datasage-io/datasage/src/proto/policy"
 	tagpb "github.com/datasage-io/datasage/src/proto/tag"
 	"github.com/datasage-io/datasage/src/storage"
 	"github.com/google/uuid"
@@ -43,6 +44,10 @@ type TagServer struct {
 
 type ClassServer struct {
 	classpb.UnimplementedClassServer
+}
+
+type PolicyServer struct {
+	policy.UnimplementedPolicyServer
 }
 
 // ====================//
@@ -375,6 +380,20 @@ func (d *DatasourceServer) ApplyPolicy(ctx context.Context, in *ds.ApplyPolicyRe
 	return &ds.ApplyPolicyResponse{StatusCode: codes.OK.String(), Message: "Recommended Policy Applied"}, nil
 }
 
+// ================================== //
+// == Apply Policy From .yaml File == //
+// ================================== //
+
+func (P *PolicyServer) ReadPolicy(ctx context.Context, in *policy.ReadPolicyYAMLFile) (*policy.PolicyResponse, error) {
+	fmt.Println("Apply Policy from YAML File")
+	fmt.Println("################### Read File Content --- Start --- ###################### ")
+	fmt.Println(in.GetPolicy())
+	fmt.Println("################### Read File Content --- End --- ###################### ")
+	return &policy.PolicyResponse{
+		Message: "Policy Applied Successfully",
+	}, nil
+}
+
 // ================= //
 // == gRPC Server == //
 // ================= //
@@ -394,6 +413,7 @@ func RunServer() {
 	ds.RegisterDatasourceServer(s, &DatasourceServer{})
 	tagpb.RegisterTagServer(s, &TagServer{})
 	classpb.RegisterClassServer(s, &ClassServer{})
+	policy.RegisterPolicyServer(s, &PolicyServer{})
 
 	//Start service
 	log.Info().Msgf("gRPC server on %s port started", PortNumber)
